@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------
+// SALON (paramètres de l'enseigne — un seul enregistrement en général)
+// ---------------------------------------------------------------
+model Salon {
+  id          String   @id @default(uuid())
+  nomEnseigne String
+  adresse     String?
+  telephone   String?
+  email       String?
+  logoUrl     String?
+  dureeCreneauMinutes Int @default(30) // durée standard d'un créneau de RDV
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  indisponibilites Indisponibilite[]
+  horaires         HoraireOuverture[]
+}
+
+// Plages d'ouverture hebdomadaires (0=Dimanche ... 6=Samedi)
+model HoraireOuverture {
+  id          String  @id @default(uuid())
+  salonId     String
+  salon       Salon   @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  jourSemaine Int
+  heureDebut  String // format "HH:mm"
+  heureFin    String // format "HH:mm"
+  ferme       Boolean @default(false)
+
+  @@index([salonId])
+}
+
+// ---------------------------------------------------------------
+// ADMINISTRATEUR (coiffeur / gestionnaire)
+// ---------------------------------------------------------------
+model Admin {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  nom          String?
+  createdAt    DateTime @default(now())
+}
+
+// ---------------------------------------------------------------
+// CLIENT
+// ---------------------------------------------------------------
+model Client {
+  id        String   @id @default(uuid())
+  nom       String
+  prenom    String
+  email     String
+  telephone String
+  adresse   String?
+  createdAt DateTime @default(now())
+
+  rendezVous RendezVous[]
+
+  @@index([email])
+  @@index([telephone])
+}
+
+// ---------------------------------------------------------------
+// COUPE (catalogue de coiffures proposées par le coiffeur)
+// ---------------------------------------------------------------
+model Coupe {
+  id          String   @id @default(uuid())
+  nom         String
+  description String?
+  photos      String[] // jusqu'à 3 URLs de photos
+  prixFcfa    Int
+  actif       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rendezVous RendezVous[]
+}
+
+// ---------------------------------------------------------------
+// RENDEZ-VOUS
+// ---------------------------------------------------------------
+// Cycle de vie :
+// EN_ATTENTE -> VALIDE (accepté par le coiffeur) -> TERMINE (prestation faite + encaissée -> compte dans le CA)
+//            -> REFUSE (refusé par le coiffeur)
+//            -> ANNULE (annulé par le client ou le coiffeur)
+enum StatutRendezVous {
+  EN_ATTENTE
+  VALIDE
+  TERMINE
+  REFUSE
+  ANNULE
+}
+
+model RendezVous {
+  id             String           @id @default(uuid())
+  clientId       String
+  client         Client           @relation(fields: [clientId], references: [id])
+  coupeId        String
+  coupe          Coupe            @relation(fields: [coupeId], references: [id])
+  tarifApplique  Int // snapshot du prix de la coupe au moment de la réservation
+  dateHeureDebut DateTime
+  dateHeureFin   DateTime // = dateHeureDebut + salon.dureeCreneauMinutes, calculée à la création
+  statut         StatutRendezVous @default(EN_ATTENTE)
+  notesAdmin     String?
+  dateCreation   DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([dateHeureDebut])
+  @@index([statut])
+}
+
+// ---------------------------------------------------------------
+// INDISPONIBILITE (congés, pauses, fermetures)
+// ---------------------------------------------------------------
+model Indisponibilite {
+  id        String   @id @default(uuid())
+  salonId   String
+  salon     Salon    @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  dateDebut DateTime
+  dateFin   DateTime
+  motif     String?
+  createdAt DateTime @default(now())
+
+  @@index([dateDebut, dateFin])
+}

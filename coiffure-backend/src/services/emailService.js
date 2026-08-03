@@ -1,0 +1,99 @@
+const transporter = require('../config/mailer');
+
+const FROM = process.env.EMAIL_FROM || 'Salon Coiffure <no-reply@salon.com>';
+
+async function sendMail({ to, subject, html }) {
+  try {
+    await transporter.sendMail({ from: FROM, to, subject, html });
+  } catch (err) {
+    // On ne bloque jamais le flux métier si l'e-mail échoue : on logge seulement.
+    console.error('[mailer] échec envoi e-mail:', err.message);
+  }
+}
+
+function formatDateFr(date) {
+  return new Date(date).toLocaleString('fr-FR', {
+    dateStyle: 'full',
+    timeStyle: 'short',
+  });
+}
+
+// Notifie l'admin qu'une nouvelle demande de RDV est arrivée
+async function notifyAdminNouvelleDemande(adminEmail, rdv) {
+  await sendMail({
+    to: adminEmail,
+    subject: `Nouvelle demande de rendez-vous — ${rdv.client.prenom} ${rdv.client.nom}`,
+    html: `
+      <p>Nouvelle demande de rendez-vous reçue :</p>
+      <ul>
+        <li><strong>Client :</strong> ${rdv.client.prenom} ${rdv.client.nom} (${rdv.client.telephone})</li>
+        <li><strong>Coupe :</strong> ${rdv.coupe.nom}</li>
+        <li><strong>Date :</strong> ${formatDateFr(rdv.dateHeureDebut)}</li>
+        <li><strong>Tarif :</strong> ${rdv.tarifApplique} FCFA</li>
+      </ul>
+      <p>Connectez-vous à l'espace admin pour valider ou refuser.</p>
+    `,
+  });
+}
+
+// Notifie le client de l'accusé de réception de sa demande
+async function notifyClientAccuseReception(rdv) {
+  await sendMail({
+    to: rdv.client.email,
+    subject: 'Votre demande de rendez-vous a bien été reçue',
+    html: `
+      <p>Bonjour ${rdv.client.prenom},</p>
+      <p>Nous avons bien reçu votre demande de rendez-vous pour <strong>${rdv.coupe.nom}</strong>
+      le <strong>${formatDateFr(rdv.dateHeureDebut)}</strong>.</p>
+      <p>Vous recevrez un e-mail dès que le coiffeur aura validé ou refusé votre demande.</p>
+    `,
+  });
+}
+
+// Notifie le client de l'acceptation
+async function notifyClientAcceptation(rdv) {
+  await sendMail({
+    to: rdv.client.email,
+    subject: 'Votre rendez-vous a été accepté',
+    html: `
+      <p>Bonjour ${rdv.client.prenom},</p>
+      <p>Votre rendez-vous a été <strong>accepté</strong> pour le
+      <strong>${formatDateFr(rdv.dateHeureDebut)}</strong> (${rdv.coupe.nom}).</p>
+      <p>À bientôt au salon !</p>
+    `,
+  });
+}
+
+// Notifie le client du refus
+async function notifyClientRefus(rdv) {
+  await sendMail({
+    to: rdv.client.email,
+    subject: 'Votre demande de rendez-vous a été refusée',
+    html: `
+      <p>Bonjour ${rdv.client.prenom},</p>
+      <p>Nous sommes désolés, votre demande de rendez-vous du
+      ${formatDateFr(rdv.dateHeureDebut)} n'a pas pu être acceptée.</p>
+      <p>N'hésitez pas à choisir un autre créneau.</p>
+    `,
+  });
+}
+
+// Notifie le client de l'annulation
+async function notifyClientAnnulation(rdv) {
+  await sendMail({
+    to: rdv.client.email,
+    subject: 'Votre rendez-vous a été annulé',
+    html: `
+      <p>Bonjour ${rdv.client.prenom},</p>
+      <p>Votre rendez-vous du ${formatDateFr(rdv.dateHeureDebut)} a été annulé.</p>
+    `,
+  });
+}
+
+module.exports = {
+  notifyAdminNouvelleDemande,
+  notifyClientAccuseReception,
+  notifyClientAcceptation,
+  notifyClientRefus,
+  notifyClientAnnulation,
+};
