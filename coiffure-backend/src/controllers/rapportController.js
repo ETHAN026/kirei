@@ -43,10 +43,11 @@ async function exportPdf(req, res) {
   const startX = 40;
   let y = doc.y;
   doc.fontSize(10).font('Helvetica-Bold');
-  doc.text('Date', startX, y, { width: 90 });
-  doc.text('Client', startX + 90, y, { width: 130 });
-  doc.text('Coupe', startX + 220, y, { width: 130 });
-  doc.text('Montant (FCFA)', startX + 350, y, { width: 100 });
+  doc.text('Date', startX, y, { width: 75 });
+  doc.text('Client', startX + 75, y, { width: 110 });
+  doc.text('Coupe', startX + 185, y, { width: 100 });
+  doc.text('Lieu', startX + 285, y, { width: 80 });
+  doc.text('Montant (FCFA)', startX + 365, y, { width: 90 });
   doc.moveDown(0.5);
   doc.font('Helvetica');
   doc.moveTo(startX, doc.y).lineTo(555, doc.y).stroke();
@@ -56,10 +57,11 @@ async function exportPdf(req, res) {
     if (doc.y > 750) doc.addPage();
     y = doc.y;
     doc.fontSize(9);
-    doc.text(new Date(r.dateHeureDebut).toLocaleDateString('fr-FR'), startX, y, { width: 90 });
-    doc.text(`${r.client.prenom} ${r.client.nom}`, startX + 90, y, { width: 130 });
-    doc.text(r.coupe.nom, startX + 220, y, { width: 130 });
-    doc.text(String(r.tarifApplique), startX + 350, y, { width: 100 });
+    doc.text(new Date(r.dateHeureDebut).toLocaleDateString('fr-FR'), startX, y, { width: 75 });
+    doc.text(`${r.client.prenom} ${r.client.nom}`, startX + 75, y, { width: 110 });
+    doc.text(r.coupe.nom, startX + 185, y, { width: 100 });
+    doc.text(r.lieuPrestation === 'DOMICILE' ? 'Domicile' : 'Salon', startX + 285, y, { width: 80 });
+    doc.text(String(r.tarifApplique), startX + 365, y, { width: 90 });
     doc.moveDown(0.6);
   });
 
@@ -86,6 +88,7 @@ async function exportExcel(req, res) {
     { header: 'Client', key: 'client', width: 25 },
     { header: 'Téléphone', key: 'telephone', width: 18 },
     { header: 'Coupe', key: 'coupe', width: 25 },
+    { header: 'Lieu', key: 'lieu', width: 12 },
     { header: 'Montant (FCFA)', key: 'montant', width: 16 },
   ];
   sheet.getRow(1).font = { bold: true };
@@ -96,6 +99,7 @@ async function exportExcel(req, res) {
       client: `${r.client.prenom} ${r.client.nom}`,
       telephone: r.client.telephone,
       coupe: r.coupe.nom,
+      lieu: r.lieuPrestation === 'DOMICILE' ? 'Domicile' : 'Salon',
       montant: r.tarifApplique,
     });
   });

@@ -1,6 +1,6 @@
 const express = require('express');
 const authMiddleware = require('../middleware/authMiddleware');
-const { uploadCoupePhotos } = require('../middleware/uploadMiddleware');
+const { uploadSinglePhoto } = require('../middleware/uploadMiddleware');
 
 const {
   listCoupes,
@@ -10,6 +10,8 @@ const {
   deleteCoupe,
 } = require('../controllers/coupeController');
 
+const { addPhoto, deletePhoto } = require('../controllers/coupePhotoController');
+
 const {
   listRendezVous,
   getRendezVous,
@@ -17,7 +19,15 @@ const {
   refuserRendezVous,
   terminerRendezVous,
   annulerRendezVous,
+  assignerAssistant,
 } = require('../controllers/rendezVousController');
+
+const {
+  adminListAssistants,
+  adminCreateAssistant,
+  adminUpdateAssistant,
+  adminDeleteAssistant,
+} = require('../controllers/assistantController');
 
 const {
   getSalon,
@@ -37,12 +47,16 @@ const router = express.Router();
 // Toutes les routes ci-dessous exigent un token admin valide
 router.use(authMiddleware);
 
-// --- Coupes (CRUD complet, avec upload jusqu'à 3 photos) ---
+// --- Coupes (CRUD infos ; les photos sont gérées séparément ci-dessous) ---
 router.get('/coupes', listCoupes);
 router.get('/coupes/:id', getCoupe);
-router.post('/coupes', uploadCoupePhotos.array('photos', 3), createCoupe);
-router.put('/coupes/:id', uploadCoupePhotos.array('photos', 3), updateCoupe);
+router.post('/coupes', createCoupe);
+router.put('/coupes/:id', updateCoupe);
 router.delete('/coupes/:id', deleteCoupe);
+
+// --- Photos d'une coupe (ajout/suppression indépendants, max 3) ---
+router.post('/coupes/:id/photos', uploadSinglePhoto.single('photo'), addPhoto);
+router.delete('/coupes/:id/photos/:photoId', deletePhoto);
 
 // --- Rendez-vous (calendrier + workflow de validation) ---
 router.get('/rendez-vous', listRendezVous);
@@ -51,6 +65,13 @@ router.patch('/rendez-vous/:id/valider', validerRendezVous);
 router.patch('/rendez-vous/:id/refuser', refuserRendezVous);
 router.patch('/rendez-vous/:id/terminer', terminerRendezVous);
 router.patch('/rendez-vous/:id/annuler', annulerRendezVous);
+router.patch('/rendez-vous/:id/assistant', assignerAssistant);
+
+// --- Assistants (CRUD géré par le coiffeur) ---
+router.get('/assistants', adminListAssistants);
+router.post('/assistants', adminCreateAssistant);
+router.put('/assistants/:id', adminUpdateAssistant);
+router.delete('/assistants/:id', adminDeleteAssistant);
 
 // --- Salon : paramètres, horaires, congés ---
 router.get('/salon', getSalon);

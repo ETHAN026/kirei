@@ -2,20 +2,20 @@ const prisma = require('../config/prisma');
 const { getCreneauxDisponibles } = require('../services/disponibiliteService');
 const emailService = require('../services/emailService');
 
-const RDV_INCLUDE = { client: true, coupe: true };
+const RDV_INCLUDE = { client: true, coupe: true, assistant: { select: { id: true, nom: true, prenom: true } } };
 
-// GET /api/creneaux-disponibles?date=YYYY-MM-DD  (public)
+// GET /api/creneaux-disponibles?date=YYYY-MM-DD&assistantId=  (public)
 async function creneauxDisponibles(req, res) {
-  const { date } = req.query;
+  const { date, assistantId } = req.query;
   if (!date) return res.status(400).json({ error: 'Le paramètre "date" (YYYY-MM-DD) est requis.' });
 
-  const creneaux = await getCreneauxDisponibles(date);
+  const creneaux = await getCreneauxDisponibles(date, assistantId || null);
   res.json(creneaux);
 }
 
 // POST /api/rendez-vous  (public — création par le client)
 async function creerRendezVous(req, res) {
-  const { nom, prenom, email, telephone, adresse, coupeId, dateHeureDebut } = req.body;
+  const { nom, prenom, email, telephone, adresse, coupeId, dateHeureDebut, lieuPrestation, adresseDomicile, assistantId } = req.body;
 
   if (!nom || !prenom || !email || !telephone || !coupeId || !dateHeureDebut) {
     return res.status(400).json({
@@ -23,13 +23,36 @@ async function creerRendezVous(req, res) {
     });
   }
 
+  const lieu = lieuPrestation === 'DOMICILE' ? 'DOMICILE' : 'SALON';
+
   const coupe = await prisma.coupe.findUnique({ where: { id: coupeId } });
   if (!coupe || !coupe.actif) {
     return res.status(404).json({ error: 'Coupe introuvable ou indisponible.' });
   }
 
+  // Si un assistant précis est demandé, vérifie qu'il existe et est actif
+  let assistant = null;
+  if (assistantId) {
+    assistant = await prisma.assistant.findUnique({ where: { id: assistantId } });
+    if (!assistant || !assistant.actif) {
+      return res.status(404).json({ error: 'Assistant introuvable ou indisponible.' });
+    }
+  }
+
   const salon = await prisma.salon.findFirst();
   if (!salon) return res.status(500).json({ error: 'Salon non configuré.' });
+
+  // Service à domicile : dépend de la coupe choisie (chaque coupe a son propre tarif domicile).
+  let tarifApplique = coupe.prixFcfa;
+  if (lieu === 'DOMICILE') {
+    if (!coupe.domicileDisponible || coupe.prixDomicileFcfa == null) {
+      return res.status(400).json({ error: "Cette coupe n'est pas proposée à domicile actuellement." });
+    }
+    if (!adresseDomicile || !adresseDomicile.trim()) {
+      return res.status(400).json({ error: 'Une adresse est requise pour une prestation à domicile.' });
+    }
+    tarifApplique = coupe.prixDomicileFcfa;
+  }
 
   const debut = new Date(dateHeureDebut);
   if (Number.isNaN(debut.getTime()) || debut < new Date()) {
@@ -37,10 +60,11 @@ async function creerRendezVous(req, res) {
   }
   const fin = new Date(debut.getTime() + salon.dureeCreneauMinutes * 60000);
 
-  // Vérifie que le créneau est toujours libre (anti double-réservation)
+  // Vérifie que le créneau est toujours libre POUR CE PRATICIEN (anti double-réservation)
   const conflit = await prisma.rendezVous.findFirst({
     where: {
       statut: { in: ['EN_ATTENTE', 'VALIDE', 'TERMINE'] },
+      assistantId: assistantId || null,
       dateHeureDebut: { lt: fin },
       dateHeureFin: { gt: debut },
     },
@@ -57,7 +81,10 @@ async function creerRendezVous(req, res) {
     data: {
       clientId: client.id,
       coupeId: coupe.id,
-      tarifApplique: coupe.prixFcfa,
+      assistantId: assistantId || null,
+      tarifApplique,
+      lieuPrestation: lieu,
+      adresseDomicile: lieu === 'DOMICILE' ? adresseDomicile.trim() : null,
       dateHeureDebut: debut,
       dateHeureFin: fin,
       statut: 'EN_ATTENTE',
@@ -156,6 +183,46 @@ async function annulerRendezVous(req, res) {
   return changerStatut(req, res, 'ANNULE', emailService.notifyClientAnnulation);
 }
 
+// PATCH /api/admin/rendez-vous/:id/assistant  (admin — attribue ou change l'assistant assigné)
+// body: { assistantId: string | null }
+async function assignerAssistant(req, res) {
+  const rdv = await prisma.rendezVous.findUnique({ where: { id: req.params.id } });
+  if (!rdv) return res.status(404).json({ error: 'Rendez-vous introuvable.' });
+  if (['TERMINE', 'ANNULE', 'REFUSE'].includes(rdv.statut)) {
+    return res.status(409).json({ error: `Impossible de modifier l'assistant d'un RDV au statut ${rdv.statut}.` });
+  }
+
+  const { assistantId } = req.body;
+
+  if (assistantId) {
+    const assistant = await prisma.assistant.findUnique({ where: { id: assistantId } });
+    if (!assistant || !assistant.actif) {
+      return res.status(404).json({ error: 'Assistant introuvable ou inactif.' });
+    }
+    // Vérifie que cet assistant est libre sur ce créneau (hors ce RDV lui-même)
+    const conflit = await prisma.rendezVous.findFirst({
+      where: {
+        id: { not: rdv.id },
+        assistantId,
+        statut: { in: ['EN_ATTENTE', 'VALIDE', 'TERMINE'] },
+        dateHeureDebut: { lt: rdv.dateHeureFin },
+        dateHeureFin: { gt: rdv.dateHeureDebut },
+      },
+    });
+    if (conflit) {
+      return res.status(409).json({ error: 'Cet assistant a déjà un rendez-vous sur ce créneau.' });
+    }
+  }
+
+  const updated = await prisma.rendezVous.update({
+    where: { id: req.params.id },
+    data: { assistantId: assistantId || null },
+    include: RDV_INCLUDE,
+  });
+
+  res.json(updated);
+}
+
 module.exports = {
   creneauxDisponibles,
   creerRendezVous,
@@ -165,4 +232,5 @@ module.exports = {
   refuserRendezVous,
   terminerRendezVous,
   annulerRendezVous,
+  assignerAssistant,
 };

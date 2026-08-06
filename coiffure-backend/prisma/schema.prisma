@@ -39,7 +39,7 @@ model HoraireOuverture {
 }
 
 // ---------------------------------------------------------------
-// ADMINISTRATEUR (coiffeur / gestionnaire)
+// ADMINISTRATEUR (coiffeur / gestionnaire — propriétaire du salon)
 // ---------------------------------------------------------------
 model Admin {
   id           String   @id @default(uuid())
@@ -47,6 +47,23 @@ model Admin {
   passwordHash String
   nom          String?
   createdAt    DateTime @default(now())
+}
+
+// ---------------------------------------------------------------
+// ASSISTANT (membre du personnel géré par le coiffeur)
+// ---------------------------------------------------------------
+model Assistant {
+  id           String   @id @default(uuid())
+  nom          String
+  prenom       String
+  email        String   @unique
+  telephone    String?
+  passwordHash String
+  actif        Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  rendezVous RendezVous[]
 }
 
 // ---------------------------------------------------------------
@@ -71,16 +88,30 @@ model Client {
 // COUPE (catalogue de coiffures proposées par le coiffeur)
 // ---------------------------------------------------------------
 model Coupe {
-  id          String   @id @default(uuid())
-  nom         String
-  description String?
-  photos      String[] // jusqu'à 3 URLs de photos
-  prixFcfa    Int
-  actif       Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                  String   @id @default(uuid())
+  nom                 String
+  description         String?
+  prixFcfa            Int
+  domicileDisponible  Boolean  @default(false) // cette coupe est-elle proposée à domicile ?
+  prixDomicileFcfa    Int?     // prix à domicile pour CETTE coupe (remplace prixFcfa si domicile choisi)
+  actif               Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
+  photos     Photo[]
   rendezVous RendezVous[]
+}
+
+// Photo d'une coupe — gérée indépendamment (ajout/suppression individuels), max 3 par coupe
+model Photo {
+  id        String   @id @default(uuid())
+  coupeId   String
+  coupe     Coupe    @relation(fields: [coupeId], references: [id], onDelete: Cascade)
+  url       String
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([coupeId])
 }
 
 // ---------------------------------------------------------------
@@ -98,13 +129,22 @@ enum StatutRendezVous {
   ANNULE
 }
 
+enum LieuPrestation {
+  SALON
+  DOMICILE
+}
+
 model RendezVous {
   id             String           @id @default(uuid())
   clientId       String
   client         Client           @relation(fields: [clientId], references: [id])
   coupeId        String
   coupe          Coupe            @relation(fields: [coupeId], references: [id])
-  tarifApplique  Int // snapshot du prix de la coupe au moment de la réservation
+  assistantId    String?          // null = pris en charge par le coiffeur lui-même
+  assistant      Assistant?       @relation(fields: [assistantId], references: [id])
+  tarifApplique  Int // snapshot du prix appliqué (coupe, ou tarif fixe domicile) au moment de la réservation
+  lieuPrestation LieuPrestation   @default(SALON)
+  adresseDomicile String?         // requise si lieuPrestation = DOMICILE
   dateHeureDebut DateTime
   dateHeureFin   DateTime // = dateHeureDebut + salon.dureeCreneauMinutes, calculée à la création
   statut         StatutRendezVous @default(EN_ATTENTE)
@@ -114,6 +154,7 @@ model RendezVous {
 
   @@index([dateHeureDebut])
   @@index([statut])
+  @@index([assistantId])
 }
 
 // ---------------------------------------------------------------

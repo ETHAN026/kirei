@@ -30,6 +30,8 @@ export default function ParametresAdmin() {
         telephone: salon.telephone || '',
         email: salon.email || '',
         dureeCreneauMinutes: salon.dureeCreneauMinutes || 30,
+        domicileActif: salon.domicileActif || false,
+        domicilePrixFcfa: salon.domicilePrixFcfa ?? '',
       });
       const base = JOURS.map((_, jourSemaine) => {
         const existing = salon.horaires.find((h) => h.jourSemaine === jourSemaine);
@@ -133,6 +135,34 @@ export default function ParametresAdmin() {
             <input className="input" value={salonForm.adresse}
               onChange={(e) => setSalonForm({ ...salonForm, adresse: e.target.value })} />
           </div>
+
+          <div className="sm:col-span-2 rounded-xl border border-ink/10 bg-ink/[0.02] p-4">
+            <label className="flex items-center gap-2 text-sm font-medium text-ink">
+              <input
+                type="checkbox"
+                checked={salonForm.domicileActif}
+                onChange={(e) => setSalonForm({ ...salonForm, domicileActif: e.target.checked })}
+              />
+              Proposer le service à domicile
+            </label>
+            <p className="mt-1 text-xs text-ink/45">
+              Si activé, les clients pourront choisir de se faire coiffer chez eux au tarif fixe ci-dessous
+              (ce tarif remplace le prix normal de la coupe choisie).
+            </p>
+            {salonForm.domicileActif && (
+              <div className="mt-3 max-w-xs">
+                <label className="label">Prix fixe du service à domicile (FCFA)</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="input"
+                  value={salonForm.domicilePrixFcfa}
+                  onChange={(e) => setSalonForm({ ...salonForm, domicilePrixFcfa: e.target.value })}
+                />
+              </div>
+            )}
+          </div>
+
           <div className="sm:col-span-2">
             <button type="submit" disabled={saving} className="btn-primary">
               {saving ? 'Enregistrement…' : 'Enregistrer'}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getCoupes } from '../../api/public';
 import Loader from '../../components/Loader';
+import { FiHome } from 'react-icons/fi';
 
 export default function Catalogue() {
   const [coupes, setCoupes] = useState([]);
@@ -34,7 +35,7 @@ export default function Catalogue() {
                 {[0, 1, 2].map((i) => (
                   <div key={i} className="aspect-square overflow-hidden bg-plum-50">
                     {c.photos?.[i] ? (
-                      <img src={c.photos[i]} alt={`${c.nom} ${i + 1}`} className="h-full w-full object-cover" />
+                      <img src={c.photos[i].url} alt={`${c.nom} ${i + 1}`} className="h-full w-full object-cover" />
                     ) : null}
                   </div>
                 ))}
@@ -42,6 +43,11 @@ export default function Catalogue() {
               <div className="p-5">
                 <p className="font-display text-xl text-ink">{c.nom}</p>
                 {c.description && <p className="mt-1 text-sm text-ink/55">{c.description}</p>}
+                {c.domicileDisponible && (
+                  <p className="mt-1 flex items-center gap-1 text-xs text-gold-600">
+                    <FiHome size={12} /> À domicile : {c.prixDomicileFcfa} FCFA
+                  </p>
+                )}
                 <div className="mt-4 flex items-center justify-between">
                   <span className="text-lg font-semibold text-plum-600">{c.prixFcfa} FCFA</span>
                   <Link to="/reserver" state={{ coupeId: c.id }} className="btn-secondary !py-2 !px-4">

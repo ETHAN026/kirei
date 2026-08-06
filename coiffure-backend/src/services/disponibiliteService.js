@@ -1,11 +1,15 @@
 const prisma = require('../config/prisma');
 
 /**
- * Génère les créneaux disponibles pour une date donnée.
+ * Génère les créneaux disponibles pour une date donnée, pour un praticien donné.
  * Se base sur : les horaires d'ouverture du salon, les indisponibilités
- * (congés/pauses), et les RDV déjà EN_ATTENTE ou VALIDE ce jour-là.
+ * (congés/pauses), et les RDV déjà EN_ATTENTE/VALIDE/TERMINE ce jour-là.
+ *
+ * @param {string} dateStr - date au format YYYY-MM-DD
+ * @param {string|null} assistantId - si fourni, ne regarde que les créneaux de cet assistant.
+ *   Si null/absent, regarde les créneaux du coiffeur lui-même (assistantId = null en base).
  */
-async function getCreneauxDisponibles(dateStr) {
+async function getCreneauxDisponibles(dateStr, assistantId = null) {
   const salon = await prisma.salon.findFirst({ include: { horaires: true } });
   if (!salon) throw Object.assign(new Error('Salon non configuré.'), { status: 500 });
 
@@ -24,7 +28,7 @@ async function getCreneauxDisponibles(dateStr) {
   const fermeture = new Date(jourDate);
   fermeture.setHours(hFin, mFin, 0, 0);
 
-  // Indisponibilités (congés/pauses) qui chevauchent ce jour
+  // Indisponibilités (congés/pauses) qui chevauchent ce jour — s'appliquent à tout le salon
   const finJournee = new Date(jourDate);
   finJournee.setHours(23, 59, 59, 999);
   const indisponibilites = await prisma.indisponibilite.findMany({
@@ -35,11 +39,12 @@ async function getCreneauxDisponibles(dateStr) {
     },
   });
 
-  // RDV déjà occupés ce jour (en attente ou validés -> on bloque le créneau)
+  // RDV déjà occupés ce jour pour CE praticien précis (coiffeur si assistantId=null, sinon l'assistant)
   const rdvOccupes = await prisma.rendezVous.findMany({
     where: {
       dateHeureDebut: { gte: jourDate, lte: finJournee },
       statut: { in: ['EN_ATTENTE', 'VALIDE', 'TERMINE'] },
+      assistantId: assistantId || null,
     },
     select: { dateHeureDebut: true, dateHeureFin: true },
   });

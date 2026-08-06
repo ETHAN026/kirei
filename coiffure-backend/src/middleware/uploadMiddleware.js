@@ -30,4 +30,10 @@ const uploadCoupePhotos = multer({
   limits: { fileSize: 5 * 1024 * 1024, files: 3 }, // 5 Mo/photo, 3 photos max
 });
 
-module.exports = { uploadCoupePhotos, UPLOAD_DIR };
+const uploadSinglePhoto = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+
+module.exports = { uploadCoupePhotos, uploadSinglePhoto, UPLOAD_DIR };

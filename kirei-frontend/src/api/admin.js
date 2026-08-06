@@ -4,13 +4,22 @@ import api from './client';
 export const login = (email, password) => api.post('/auth/login', { email, password }).then((r) => r.data);
 export const getMe = () => api.get('/auth/me').then((r) => r.data);
 
-// Coupes
+// Coupes (infos uniquement, en JSON — les photos sont gérées séparément)
 export const adminGetCoupes = () => api.get('/admin/coupes').then((r) => r.data);
-export const adminCreateCoupe = (formData) =>
-  api.post('/admin/coupes', formData, { headers: { 'Content-Type': 'multipart/form-data' } }).then((r) => r.data);
-export const adminUpdateCoupe = (id, formData) =>
-  api.put(`/admin/coupes/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }).then((r) => r.data);
+export const adminCreateCoupe = (payload) => api.post('/admin/coupes', payload).then((r) => r.data);
+export const adminUpdateCoupe = (id, payload) => api.put(`/admin/coupes/${id}`, payload).then((r) => r.data);
 export const adminDeleteCoupe = (id) => api.delete(`/admin/coupes/${id}`).then((r) => r.data);
+
+// Photos d'une coupe (ajout/suppression indépendants)
+export const adminAddCoupePhoto = (coupeId, file) => {
+  const formData = new FormData();
+  formData.append('photo', file);
+  return api
+    .post(`/admin/coupes/${coupeId}/photos`, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+    .then((r) => r.data);
+};
+export const adminDeleteCoupePhoto = (coupeId, photoId) =>
+  api.delete(`/admin/coupes/${coupeId}/photos/${photoId}`).then((r) => r.data);
 
 // Rendez-vous
 export const adminGetRendezVous = (params) => api.get('/admin/rendez-vous', { params }).then((r) => r.data);
@@ -18,6 +27,14 @@ export const adminValiderRdv = (id) => api.patch(`/admin/rendez-vous/${id}/valid
 export const adminRefuserRdv = (id) => api.patch(`/admin/rendez-vous/${id}/refuser`).then((r) => r.data);
 export const adminTerminerRdv = (id) => api.patch(`/admin/rendez-vous/${id}/terminer`).then((r) => r.data);
 export const adminAnnulerRdv = (id) => api.patch(`/admin/rendez-vous/${id}/annuler`).then((r) => r.data);
+export const adminAssignerAssistant = (id, assistantId) =>
+  api.patch(`/admin/rendez-vous/${id}/assistant`, { assistantId: assistantId || null }).then((r) => r.data);
+
+// Assistants (personnel géré par le coiffeur)
+export const adminGetAssistants = () => api.get('/admin/assistants').then((r) => r.data);
+export const adminCreateAssistant = (payload) => api.post('/admin/assistants', payload).then((r) => r.data);
+export const adminUpdateAssistant = (id, payload) => api.put(`/admin/assistants/${id}`, payload).then((r) => r.data);
+export const adminDeleteAssistant = (id) => api.delete(`/admin/assistants/${id}`).then((r) => r.data);
 
 // Salon / horaires / congés
 export const adminGetSalon = () => api.get('/admin/salon').then((r) => r.data);

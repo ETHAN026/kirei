@@ -9,6 +9,8 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 
 const authRoutes = require('./routes/authRoutes');
+const assistantAuthRoutes = require('./routes/assistantAuthRoutes');
+const assistantRoutes = require('./routes/assistantRoutes');
 const publicRoutes = require('./routes/publicRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const errorHandler = require('./middleware/errorHandler');
@@ -16,16 +18,15 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
 // --- Sécurité de base ---
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+  })
+);
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || '*',
     credentials: true,
-  })
-);
-app.use(
-  helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" }
   })
 );
 app.use(express.json({ limit: '2mb' }));
@@ -39,6 +40,7 @@ const authLimiter = rateLimit({
   message: { error: 'Trop de tentatives, réessayez plus tard.' },
 });
 app.use('/api/auth/login', authLimiter);
+app.use('/api/assistant-auth/login', authLimiter);
 
 // Anti-spam sur la création de rendez-vous publique
 const rdvLimiter = rateLimit({
@@ -54,6 +56,8 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 // --- Routes ---
 app.get('/api/health', (req, res) => res.json({ status: 'ok', date: new Date().toISOString() }));
 app.use('/api/auth', authRoutes);
+app.use('/api/assistant-auth', assistantAuthRoutes);
+app.use('/api/assistant', assistantRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api', publicRoutes);
 

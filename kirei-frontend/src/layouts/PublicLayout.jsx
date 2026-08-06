@@ -31,7 +31,10 @@ export default function PublicLayout() {
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p className="font-display text-lg text-ink/70">Kirei — 綺麗</p>
             <p>&copy; {new Date().getFullYear()} Kirei. Tous droits réservés.</p>
-            <Link to="/admin/login" className="hover:text-plum-600">Espace coiffeur</Link>
+            <div className="flex gap-4">
+              <Link to="/admin/login" className="hover:text-plum-600">Espace coiffeur</Link>
+              <Link to="/assistant/login" className="hover:text-plum-600">Espace assistant</Link>
+            </div>
           </div>
         </div>
       </footer>

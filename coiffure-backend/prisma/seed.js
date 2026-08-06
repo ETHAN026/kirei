@@ -50,7 +50,21 @@ async function main() {
   console.log('🌱 Seed terminé.');
 }
 
+// Assistant de démonstration (facultatif, pratique pour tester l'espace assistant)
+async function seedAssistantDemo() {
+  const email = 'assistant@salon.com';
+  const existing = await prisma.assistant.findUnique({ where: { email } });
+  if (!existing) {
+    const passwordHash = await bcrypt.hash('Assistant123!', 12);
+    await prisma.assistant.create({
+      data: { nom: 'Kpadonou', prenom: 'Fabrice', email, telephone: '+229 00 00 00 01', passwordHash },
+    });
+    console.log(`✅ Assistant de démo créé : ${email} / Assistant123!`);
+  }
+}
+
 main()
+  .then(seedAssistantDemo)
   .catch((e) => {
     console.error(e);
     process.exit(1);

@@ -1,10 +1,6 @@
-const fs = require('fs');
-const path = require('path');
 const prisma = require('../config/prisma');
 
-function toPublicUrl(req, filename) {
-  return `${req.protocol}://${req.get('host')}/uploads/coupes/${filename}`;
-}
+const WITH_PHOTOS = { photos: { orderBy: { position: 'asc' } } };
 
 // GET /api/coupes  (public — catalogue pour les clients)
 async function listCoupes(req, res) {
@@ -14,6 +10,7 @@ async function listCoupes(req, res) {
 
   const coupes = await prisma.coupe.findMany({
     where,
+    include: WITH_PHOTOS,
     orderBy: { createdAt: 'desc' },
   });
   res.json(coupes);
@@ -21,63 +18,71 @@ async function listCoupes(req, res) {
 
 // GET /api/coupes/:id
 async function getCoupe(req, res) {
-  const coupe = await prisma.coupe.findUnique({ where: { id: req.params.id } });
+  const coupe = await prisma.coupe.findUnique({ where: { id: req.params.id }, include: WITH_PHOTOS });
   if (!coupe) return res.status(404).json({ error: 'Coupe introuvable.' });
   res.json(coupe);
 }
 
-// POST /api/admin/coupes  (admin — création avec upload jusqu'à 3 photos)
+function validateDomicile(domicileDisponible, prixDomicileFcfa) {
+  const actif = domicileDisponible === true || domicileDisponible === 'true';
+  if (actif && (prixDomicileFcfa === undefined || prixDomicileFcfa === null || Number(prixDomicileFcfa) <= 0)) {
+    return 'Un prix à domicile valide est requis si le service à domicile est activé pour cette coupe.';
+  }
+  return null;
+}
+
+// POST /api/admin/coupes  (admin — création, sans photos : gérées séparément)
 async function createCoupe(req, res) {
-  const { nom, description, prixFcfa } = req.body;
+  const { nom, description, prixFcfa, domicileDisponible, prixDomicileFcfa } = req.body;
   if (!nom || !prixFcfa) {
     return res.status(400).json({ error: 'Le nom et le prix sont obligatoires.' });
   }
 
-  const files = req.files || [];
-  const photos = files.map((f) => toPublicUrl(req, f.filename));
+  const domicileError = validateDomicile(domicileDisponible, prixDomicileFcfa);
+  if (domicileError) return res.status(400).json({ error: domicileError });
 
   const coupe = await prisma.coupe.create({
     data: {
       nom,
       description: description || null,
       prixFcfa: Number(prixFcfa),
-      photos,
+      domicileDisponible: domicileDisponible === true || domicileDisponible === 'true',
+      prixDomicileFcfa: prixDomicileFcfa ? Number(prixDomicileFcfa) : null,
     },
+    include: WITH_PHOTOS,
   });
 
   res.status(201).json(coupe);
 }
 
-// PUT /api/admin/coupes/:id  (admin — modification, remplace les photos si de nouvelles sont envoyées)
+// PUT /api/admin/coupes/:id  (admin — modification des infos uniquement, pas des photos)
 async function updateCoupe(req, res) {
   const existing = await prisma.coupe.findUnique({ where: { id: req.params.id } });
   if (!existing) return res.status(404).json({ error: 'Coupe introuvable.' });
 
-  const { nom, description, prixFcfa, actif } = req.body;
+  const { nom, description, prixFcfa, actif, domicileDisponible, prixDomicileFcfa } = req.body;
+
+  const domicileActifFinal =
+    domicileDisponible !== undefined ? (domicileDisponible === true || domicileDisponible === 'true') : existing.domicileDisponible;
+  const prixDomicileFinal = prixDomicileFcfa !== undefined ? prixDomicileFcfa : existing.prixDomicileFcfa;
+  const domicileError = validateDomicile(domicileActifFinal, prixDomicileFinal);
+  if (domicileError) return res.status(400).json({ error: domicileError });
+
   const data = {};
   if (nom !== undefined) data.nom = nom;
   if (description !== undefined) data.description = description;
   if (prixFcfa !== undefined) data.prixFcfa = Number(prixFcfa);
   if (actif !== undefined) data.actif = actif === 'true' || actif === true;
+  if (domicileDisponible !== undefined) data.domicileDisponible = domicileActifFinal;
+  if (prixDomicileFcfa !== undefined) data.prixDomicileFcfa = prixDomicileFcfa === '' ? null : Number(prixDomicileFcfa);
 
-  const files = req.files || [];
-  if (files.length > 0) {
-    // Supprime les anciennes photos physiques avant de les remplacer
-    existing.photos.forEach((url) => {
-      const filename = url.split('/uploads/coupes/')[1];
-      const filepath = path.join(__dirname, '..', '..', 'uploads', 'coupes', filename);
-      fs.unlink(filepath, () => {});
-    });
-    data.photos = files.map((f) => toPublicUrl(req, f.filename));
-  }
-
-  const coupe = await prisma.coupe.update({ where: { id: req.params.id }, data });
+  const coupe = await prisma.coupe.update({ where: { id: req.params.id }, data, include: WITH_PHOTOS });
   res.json(coupe);
 }
 
-// DELETE /api/admin/coupes/:id  (admin)
+// DELETE /api/admin/coupes/:id  (admin — supprime aussi ses photos, cascade DB + fichiers)
 async function deleteCoupe(req, res) {
-  const existing = await prisma.coupe.findUnique({ where: { id: req.params.id } });
+  const existing = await prisma.coupe.findUnique({ where: { id: req.params.id }, include: WITH_PHOTOS });
   if (!existing) return res.status(404).json({ error: 'Coupe introuvable.' });
 
   const enUsage = await prisma.rendezVous.count({
@@ -89,13 +94,10 @@ async function deleteCoupe(req, res) {
     });
   }
 
-  existing.photos.forEach((url) => {
-    const filename = url.split('/uploads/coupes/')[1];
-    const filepath = path.join(__dirname, '..', '..', 'uploads', 'coupes', filename);
-    fs.unlink(filepath, () => {});
-  });
+  const { deletePhotoFile } = require('./coupePhotoController');
+  existing.photos.forEach((p) => deletePhotoFile(p.url));
 
-  await prisma.coupe.delete({ where: { id: req.params.id } });
+  await prisma.coupe.delete({ where: { id: req.params.id } }); // cascade supprime les Photo en DB
   res.json({ message: 'Coupe supprimée.' });
 }
 
