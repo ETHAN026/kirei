@@ -1,0 +1,5 @@
+node_modules/
+.env
+uploads/coupes/*
+!uploads/coupes/.gitkeep
+*.log
