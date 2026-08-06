@@ -1,7 +1,7 @@
 import api from './client';
 
 // Auth
-export const login = (email, password) => api.post('/auth/login', { email, password }).then((r) => r.data);
+export const login = (email, password) => api.post('/api/auth/login', { email, password }).then((r) => r.data);
 export const getMe = () => api.get('/auth/me').then((r) => r.data);
 
 // Coupes (infos uniquement, en JSON — les photos sont gérées séparément)
