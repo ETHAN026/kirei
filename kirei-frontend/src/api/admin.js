@@ -21,7 +21,7 @@ export const adminDeleteCoupe = (id) =>
 
 export const adminAddCoupePhoto = (coupeId, file) => {
   const formData = new FormData();
-  formData.append("image", file);
+  formData.append("photo", file);
 
   return api
     .post(`/api/admin/coupes/${coupeId}/photos`, formData, {
