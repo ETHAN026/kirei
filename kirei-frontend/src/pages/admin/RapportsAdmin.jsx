@@ -11,8 +11,6 @@ export default function RapportsAdmin() {
     if (from) params.set('from', from);
     if (to) params.set('to', to);
 
-    // On passe par un fetch pour transmettre le header Authorization,
-    // puis on déclenche le téléchargement du blob reçu.
     fetch(`${API_BASE}/api/admin/rapports/${format}?${params.toString()}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -29,8 +27,8 @@ export default function RapportsAdmin() {
 
   return (
     <div>
-      <h1 className="font-display text-3xl text-ink">Rapports financiers</h1>
-      <p className="mt-1 text-ink/50">
+      <h1 className="font-display text-2xl font-black uppercase tracking-tight text-white">Rapports financiers</h1>
+      <p className="mt-1 text-cream/45">
         Export des rendez-vous terminés (payés) sur la période sélectionnée.
       </p>
 
@@ -45,7 +43,7 @@ export default function RapportsAdmin() {
             <input type="date" className="input" value={to} onChange={(e) => setTo(e.target.value)} />
           </div>
         </div>
-        <p className="mt-2 text-xs text-ink/40">Laissez vide pour couvrir toute la période disponible.</p>
+        <p className="mt-2 text-xs text-cream/40">Laissez vide pour couvrir toute la période disponible.</p>
 
         <div className="mt-6 flex gap-3">
           <button onClick={() => download('pdf')} className="btn-primary flex-1">

@@ -1,9 +1,9 @@
 const STYLES = {
-  EN_ATTENTE: 'bg-gold-400/20 text-gold-600',
-  VALIDE: 'bg-plum-100 text-plum-600',
-  TERMINE: 'bg-sage-500/15 text-sage-600',
-  REFUSE: 'bg-clay-500/10 text-clay-600',
-  ANNULE: 'bg-ink/10 text-ink/50',
+  EN_ATTENTE: 'bg-gold-500/15 text-gold-300',
+  VALIDE: 'bg-sage-500/15 text-sage-500',
+  TERMINE: 'bg-cream/10 text-cream/70',
+  REFUSE: 'bg-clay-500/15 text-clay-500',
+  ANNULE: 'bg-cream/5 text-cream/40',
 };
 
 const LABELS = {
@@ -16,7 +16,7 @@ const LABELS = {
 
 export default function StatutBadge({ statut }) {
   return (
-    <span className={`badge ${STYLES[statut] || 'bg-ink/10 text-ink/60'}`}>
+    <span className={`badge ${STYLES[statut] || 'bg-cream/10 text-cream/60'}`}>
       {LABELS[statut] || statut}
     </span>
   );
