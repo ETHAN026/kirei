@@ -92,7 +92,7 @@ function HorizontalGallery({ panels }) {
           ref={trackRef}
           className={`flex items-center gap-6 px-5 md:gap-12 md:px-10 ${
             isMobile
-              ? 'h-[76vh] snap-x snap-mandatory overflow-x-auto pb-8'
+              ? 'h-[76vh] min-w-0 snap-x snap-mandatory overflow-x-auto pb-8'
               : 'h-full w-max will-change-transform'
           }`}
         >
@@ -336,8 +336,8 @@ export default function Home() {
 
       {/* ============ 04 — LE STUDIO ============ */}
       <section className="relative mx-auto max-w-[1400px] px-5 py-24 md:px-10 md:py-32">
-        <div className="grid grid-cols-12 gap-10 lg:gap-0">
-          <div className="col-span-12 lg:col-span-7">
+        <div className="grid grid-cols-12 gap-x-5 gap-y-10 lg:gap-0">
+          <div className="col-span-12 min-w-0 lg:col-span-7">
             <Reveal variant="scale">
               <div className="relative overflow-hidden">
                 <VideoSlot
@@ -352,7 +352,7 @@ export default function Home() {
               </div>
             </Reveal>
           </div>
-          <div className="col-span-12 flex flex-col justify-center lg:col-span-5 lg:-ml-10 lg:mt-32 lg:pl-16">
+          <div className="col-span-12 flex min-w-0 flex-col justify-center lg:col-span-5 lg:-ml-10 lg:mt-32 lg:pl-16">
             <p className="mono-label text-night/50">04 — Le studio</p>
             <h2 className="mt-4 font-display font-black uppercase leading-[0.88] tracking-tight text-night">
               <RevealLines
