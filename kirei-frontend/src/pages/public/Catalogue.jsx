@@ -1,12 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getCoupes } from '../../api/public';
+import Reveal from '../../components/Reveal';
 import Loader from '../../components/Loader';
-import { FiHome } from 'react-icons/fi';
+import { FiArrowUpRight, FiHome } from 'react-icons/fi';
+
+const FALLBACK = [
+  { id: 'fallback-1', nom: 'Coupe classique', prixFcfa: 3000, prixDomicileFcfa: 5000, domicileDisponible: true },
+  { id: 'fallback-2', nom: 'Dégradé', prixFcfa: 3500, prixDomicileFcfa: null, domicileDisponible: false },
+  { id: 'fallback-3', nom: 'Barbe', prixFcfa: 2500, prixDomicileFcfa: null, domicileDisponible: false },
+  { id: 'fallback-4', nom: 'Coupe + barbe', prixFcfa: 5000, prixDomicileFcfa: 7000, domicileDisponible: true },
+];
 
 export default function Catalogue() {
   const [coupes, setCoupes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [active, setActive] = useState(-1);
 
   useEffect(() => {
     getCoupes()
@@ -14,51 +23,101 @@ export default function Catalogue() {
       .finally(() => setLoading(false));
   }, []);
 
-  return (
-    <div className="mx-auto max-w-6xl px-6 py-16">
-      <p className="text-xs font-medium uppercase tracking-wide text-plum-600">Catalogue</p>
-      <h1 className="mt-2 font-display text-4xl text-ink">Nos coupes &amp; prestations</h1>
-      <p className="mt-3 max-w-xl text-ink/60">
-        Parcourez nos styles et choisissez celui qui vous inspire — vous pourrez ensuite réserver
-        directement le créneau de votre choix.
-      </p>
+  const services = coupes.length ? coupes : FALLBACK;
 
-      {loading ? (
-        <Loader />
-      ) : coupes.length === 0 ? (
-        <p className="mt-10 text-ink/50">Aucune coupe disponible pour le moment.</p>
-      ) : (
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {coupes.map((c) => (
-            <div key={c.id} className="overflow-hidden rounded-2xl border border-ink/10 bg-white">
-              <div className="grid grid-cols-3 gap-px bg-ink/10">
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="aspect-square overflow-hidden bg-plum-50">
-                    {c.photos?.[i] ? (
-                      <img src={c.photos[i].url} alt={`${c.nom} ${i + 1}`} className="h-full w-full object-cover" />
-                    ) : null}
-                  </div>
-                ))}
-              </div>
-              <div className="p-5">
-                <p className="font-display text-xl text-ink">{c.nom}</p>
-                {c.description && <p className="mt-1 text-sm text-ink/55">{c.description}</p>}
-                {c.domicileDisponible && (
-                  <p className="mt-1 flex items-center gap-1 text-xs text-gold-600">
-                    <FiHome size={12} /> À domicile : {c.prixDomicileFcfa} FCFA
-                  </p>
-                )}
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-lg font-semibold text-plum-600">{c.prixFcfa} FCFA</span>
-                  <Link to="/reserver" state={{ coupeId: c.id }} className="btn-secondary !py-2 !px-4">
-                    Réserver
-                  </Link>
-                </div>
-              </div>
+  return (
+    <div className="page-enter">
+      {/* En-tête éditorial */}
+      <header className="relative mx-auto max-w-[1400px] overflow-hidden px-5 pt-32 md:px-10 md:pt-44">
+        <p className="mono-label fade-up text-night/50" style={{ '--d': '0.1s' }}>
+          Catalogue — {String(services.length).padStart(2, '0')} prestations
+        </p>
+        <h1 className="mt-5 font-display font-black uppercase leading-[0.85] tracking-tight text-night">
+          <span className="hero-line block text-[clamp(2rem,6vw,5.5rem)]">
+            <span style={{ '--d': '0.25s' }}>NOS</span>
+          </span>
+          <span className="hero-line block">
+            <span className="outline-text" style={{ '--d': '0.4s' }}>
+              PRESTATIONS
+            </span>
+          </span>
+        </h1>
+        <Reveal delay={250} className="mt-8 max-w-sm md:ml-auto">
+          <p className="text-sm leading-relaxed text-night/55">
+            Parcourez la liste — chaque prestation ouvre la réservation directement.
+          </p>
+        </Reveal>
+      </header>
+
+      {/* Liste éditoriale */}
+      <section className="relative mx-auto max-w-[1400px] px-5 pb-28 pt-16 md:px-10">
+        {loading ? (
+          <Loader />
+        ) : (
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 right-[6%] z-10 hidden w-[320px] items-center lg:flex">
+              {services.map((s, i) => (
+                <img
+                  key={s.id}
+                  src={s.photos?.[0]?.url || `https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=900&auto=format&fit=crop`}
+                  alt=""
+                  aria-hidden
+                  loading="lazy"
+                  className={`img-bw absolute inset-0 h-[380px] w-full object-cover transition-all duration-500 ${
+                    active === i ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+
+            <div>
+              {services.map((s, i) => (
+                <Link
+                  key={s.id}
+                  to="/reserver"
+                  state={{ coupeId: s.id }}
+                  className="service-row group"
+                  onMouseEnter={() => setActive(i)}
+                  onMouseLeave={() => setActive(-1)}
+                >
+                  <span className="font-mono text-[11px] text-night/40 transition-colors duration-500 group-hover:text-white/40">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="flex flex-col justify-center gap-1.5">
+                    <span className="font-display text-[clamp(1.3rem,3vw,2.4rem)] font-black uppercase leading-none tracking-tight">
+                      {s.nom}
+                    </span>
+                    <span className="row-extra flex items-center gap-3 font-mono text-[10px] uppercase tracking-wide2">
+                      {s.domicileDisponible && (
+                        <span className="flex items-center gap-1.5">
+                          <FiHome size={11} /> Domicile · {s.prixDomicileFcfa?.toLocaleString('fr-FR')} FCFA
+                        </span>
+                      )}
+                    </span>
+                  </span>
+                  <span className="row-extra flex items-baseline gap-3 font-mono text-xs tracking-wide">
+                    <span className="hidden text-[10px] uppercase sm:inline">
+                      {s.prixFcfa.toLocaleString('fr-FR')} FCFA
+                    </span>
+                    <FiArrowUpRight className="row-arrow" size={20} />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Bande noire de fin */}
+      <section className="overflow-hidden bg-night py-6">
+        <p
+          className="whitespace-nowrap text-center font-display text-[clamp(1.2rem,3vw,2.6rem)] font-black uppercase leading-none tracking-tight"
+          style={{ WebkitTextStroke: '1px rgba(255,255,255,0.25)', color: 'transparent' }}
+          aria-hidden
+        >
+          RÉSERVER · RÉSERVER · RÉSERVER
+        </p>
+      </section>
     </div>
   );
 }

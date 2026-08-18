@@ -75,9 +75,7 @@ export default function RendezVousAdmin() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-3xl text-ink">Rendez-vous</h1>
-      </div>
+      <h1 className="font-display text-2xl font-black uppercase tracking-tight text-white">Rendez-vous</h1>
 
       <div className="mt-6 flex flex-wrap gap-2">
         {FILTRES.map((f) => (
@@ -85,7 +83,9 @@ export default function RendezVousAdmin() {
             key={f.value}
             onClick={() => setFiltre(f.value)}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
-              filtre === f.value ? 'bg-plum-600 text-white' : 'bg-white text-ink/60 hover:text-ink border border-ink/10'
+              filtre === f.value
+                ? 'bg-gold-500 text-night'
+                : 'border border-line bg-surface text-cream/60 hover:text-cream'
             }`}
           >
             {f.label}
@@ -98,11 +98,11 @@ export default function RendezVousAdmin() {
       {loading ? (
         <Loader />
       ) : rdvs.length === 0 ? (
-        <p className="mt-10 text-ink/50">Aucun rendez-vous pour ce filtre.</p>
+        <p className="mt-10 text-cream/50">Aucun rendez-vous pour ce filtre.</p>
       ) : (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-ink/10 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-ink/10 bg-ink/[0.02] text-xs uppercase tracking-wide text-ink/40">
+        <div className="mt-6 overflow-x-auto rounded-2xl border border-line bg-surface">
+          <table className="w-full min-w-[900px] text-left text-sm">
+            <thead className="border-b border-line bg-white/[0.02] text-xs uppercase font-black uppercase tracking-tight text-white/40">
               <tr>
                 <th className="px-4 py-3">Date & heure</th>
                 <th className="px-4 py-3">Client</th>
@@ -118,22 +118,22 @@ export default function RendezVousAdmin() {
               {rdvs.map((rdv) => {
                 const assignable = !['TERMINE', 'ANNULE', 'REFUSE'].includes(rdv.statut);
                 return (
-                  <tr key={rdv.id} className="border-b border-ink/5 last:border-0">
-                    <td className="px-4 py-3 whitespace-nowrap">
+                  <tr key={rdv.id} className="border-b border-line/60 last:border-0">
+                    <td className="whitespace-nowrap px-4 py-3">
                       {new Date(rdv.dateHeureDebut).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' })}
                     </td>
                     <td className="px-4 py-3">
-                      <p className="font-medium text-ink">{rdv.client.prenom} {rdv.client.nom}</p>
-                      <p className="text-xs text-ink/45">{rdv.client.telephone}</p>
+                      <p className="font-medium text-cream">{rdv.client.prenom} {rdv.client.nom}</p>
+                      <p className="text-xs text-cream/40">{rdv.client.telephone}</p>
                     </td>
                     <td className="px-4 py-3">{rdv.coupe.nom}</td>
                     <td className="px-4 py-3">
                       {rdv.lieuPrestation === 'DOMICILE' ? (
-                        <span title={rdv.adresseDomicile} className="badge inline-flex items-center gap-1 bg-gold-400/20 text-gold-600">
+                        <span title={rdv.adresseDomicile} className="badge inline-flex items-center gap-1 bg-gold-500/15 text-gold-300">
                           <FiHome size={12} /> Domicile
                         </span>
                       ) : (
-                        <span className="badge inline-flex items-center gap-1 bg-ink/10 text-ink/50">
+                        <span className="badge inline-flex items-center gap-1 bg-cream/10 text-cream/50">
                           <FiScissors size={12} /> Salon
                         </span>
                       )}
@@ -144,7 +144,7 @@ export default function RendezVousAdmin() {
                           value={rdv.assistantId || ''}
                           disabled={busyId === rdv.id}
                           onChange={(e) => handleAssignAssistant(rdv.id, e.target.value)}
-                          className="rounded-lg border border-ink/15 bg-white px-2 py-1.5 text-xs text-ink focus:border-plum-500 focus:outline-none"
+                          className="rounded-lg border border-line bg-raised px-2 py-1.5 text-xs text-cream focus:border-gold-500 focus:outline-none"
                         >
                           <option value="">Le coiffeur</option>
                           {assistants.map((a) => (
@@ -152,7 +152,7 @@ export default function RendezVousAdmin() {
                           ))}
                         </select>
                       ) : (
-                        <span className="text-ink/60">
+                        <span className="text-cream/55">
                           {rdv.assistant ? `${rdv.assistant.prenom} ${rdv.assistant.nom}` : 'Le coiffeur'}
                         </span>
                       )}
@@ -166,14 +166,14 @@ export default function RendezVousAdmin() {
                             <button
                               disabled={busyId === rdv.id}
                               onClick={() => handleAction(adminValiderRdv, rdv.id)}
-                              className="rounded-lg bg-sage-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-sage-600 disabled:opacity-40"
+                              className="rounded-lg bg-sage-600 px-3 py-1.5 text-xs font-semibold text-night hover:bg-sage-500 disabled:opacity-40"
                             >
                               Valider
                             </button>
                             <button
                               disabled={busyId === rdv.id}
                               onClick={() => handleAction(adminRefuserRdv, rdv.id)}
-                              className="rounded-lg bg-clay-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-clay-600 disabled:opacity-40"
+                              className="rounded-lg bg-clay-600 px-3 py-1.5 text-xs font-semibold text-night hover:bg-clay-500 disabled:opacity-40"
                             >
                               Refuser
                             </button>
@@ -184,14 +184,14 @@ export default function RendezVousAdmin() {
                             <button
                               disabled={busyId === rdv.id}
                               onClick={() => handleAction(adminTerminerRdv, rdv.id)}
-                              className="rounded-lg bg-plum-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-plum-700 disabled:opacity-40"
+                              className="rounded-lg bg-gold-500 px-3 py-1.5 text-xs font-semibold text-night hover:bg-gold-400 disabled:opacity-40"
                             >
                               Marquer payé
                             </button>
                             <button
                               disabled={busyId === rdv.id}
                               onClick={() => handleAction(adminAnnulerRdv, rdv.id)}
-                              className="rounded-lg border border-ink/15 px-3 py-1.5 text-xs font-medium text-ink/60 hover:text-ink disabled:opacity-40"
+                              className="rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-cream/60 hover:text-cream disabled:opacity-40"
                             >
                               Annuler
                             </button>

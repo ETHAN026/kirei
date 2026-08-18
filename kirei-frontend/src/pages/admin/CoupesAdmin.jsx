@@ -71,7 +71,7 @@ export default function CoupesAdmin() {
         const created = await adminCreateCoupe(payload);
         setShowForm(false);
         await load();
-        setPhotoManagerCoupe(created); // enchaîne directement sur l'ajout des photos
+        setPhotoManagerCoupe(created);
         return;
       }
       setShowForm(false);
@@ -102,7 +102,7 @@ export default function CoupesAdmin() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-3xl text-ink">Coupes &amp; prestations</h1>
+        <h1 className="font-display text-2xl font-black uppercase tracking-tight text-white">Coupes &amp; prestations</h1>
         <button onClick={openCreate} className="btn-primary">
           <FiPlus /> Ajouter une coupe
         </button>
@@ -115,26 +115,26 @@ export default function CoupesAdmin() {
       ) : (
         <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {coupes.map((c) => (
-            <div key={c.id} className="overflow-hidden rounded-2xl border border-ink/10 bg-white">
-              <div className="grid grid-cols-3 gap-px bg-ink/10">
+            <div key={c.id} className="overflow-hidden rounded-2xl border border-line bg-surface">
+              <div className="grid grid-cols-3 gap-px bg-line">
                 {[0, 1, 2].map((i) => (
-                  <div key={i} className="flex aspect-square items-center justify-center bg-plum-50">
+                  <div key={i} className="flex aspect-square items-center justify-center bg-raised">
                     {c.photos?.[i] ? (
                       <img src={c.photos[i].url} alt="" className="h-full w-full object-cover" />
                     ) : (
-                      <FiImage className="text-plum-200" size={20} />
+                      <FiImage className="text-cream/15" size={20} />
                     )}
                   </div>
                 ))}
               </div>
               <div className="p-4">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="font-display text-lg text-ink">{c.nom}</p>
-                  {!c.actif && <span className="badge bg-ink/10 text-ink/50">Inactif</span>}
+                  <p className="font-display text-xl font-black uppercase tracking-tight text-white">{c.nom}</p>
+                  {!c.actif && <span className="badge bg-cream/10 text-cream/50">Inactif</span>}
                 </div>
-                <p className="mt-1 text-sm font-medium text-plum-600">{c.prixFcfa} FCFA</p>
+                <p className="mt-1 text-sm font-semibold text-gold-400">{c.prixFcfa} FCFA</p>
                 {c.domicileDisponible && (
-                  <p className="mt-0.5 flex items-center gap-1 text-xs text-gold-600">
+                  <p className="mt-0.5 flex items-center gap-1 text-xs text-gold-300">
                     <FiHome size={12} /> Domicile : {c.prixDomicileFcfa} FCFA
                   </p>
                 )}
@@ -148,7 +148,7 @@ export default function CoupesAdmin() {
                   </button>
                   <button
                     onClick={() => handleDelete(c.id)}
-                    className="flex items-center justify-center gap-1 rounded-full border border-clay-500/30 px-2 py-1.5 text-xs font-medium text-clay-600 hover:bg-clay-500/5"
+                    className="flex items-center justify-center gap-1 rounded-full border border-clay-500/40 px-2 py-1.5 text-xs font-medium text-clay-500 hover:bg-clay-500/10"
                   >
                     <FiTrash2 size={13} /> Suppr.
                   </button>
@@ -161,11 +161,13 @@ export default function CoupesAdmin() {
 
       {/* Modal : formulaire infos coupe */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-6 backdrop-blur-sm">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-line bg-surface p-6">
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-2xl text-ink">{editingId ? 'Modifier la coupe' : 'Nouvelle coupe'}</h2>
-              <button onClick={() => setShowForm(false)} className="text-ink/40 hover:text-ink"><FiX size={20} /></button>
+              <h2 className="font-display text-xl font-black uppercase tracking-tight text-white">
+                {editingId ? 'Modifier la coupe' : 'Nouvelle coupe'}
+              </h2>
+              <button onClick={() => setShowForm(false)} className="text-cream/40 hover:text-cream"><FiX size={20} /></button>
             </div>
             <form onSubmit={handleSubmit} className="mt-5 space-y-4">
               <div>
@@ -184,8 +186,8 @@ export default function CoupesAdmin() {
                   onChange={(e) => setForm({ ...form, prixFcfa: e.target.value })} />
               </div>
 
-              <div className="rounded-xl border border-ink/10 bg-ink/[0.02] p-4">
-                <label className="flex items-center gap-2 text-sm font-medium text-ink">
+              <div className="rounded-xl border border-line bg-raised/50 p-4">
+                <label className="flex items-center gap-2 text-sm font-medium text-cream">
                   <input type="checkbox" checked={form.domicileDisponible}
                     onChange={(e) => setForm({ ...form, domicileDisponible: e.target.checked })} />
                   Proposer cette coupe à domicile
@@ -199,14 +201,14 @@ export default function CoupesAdmin() {
                 )}
               </div>
 
-              <label className="flex items-center gap-2 text-sm text-ink/70">
+              <label className="flex items-center gap-2 text-sm text-cream/70">
                 <input type="checkbox" checked={form.actif}
                   onChange={(e) => setForm({ ...form, actif: e.target.checked })} />
                 Visible dans le catalogue client
               </label>
 
               {!editingId && (
-                <p className="text-xs text-ink/40">Vous pourrez ajouter les photos juste après la création.</p>
+                <p className="text-xs text-cream/40">Vous pourrez ajouter les photos juste après la création.</p>
               )}
 
               <ErrorMessage>{error}</ErrorMessage>
@@ -269,13 +271,13 @@ function PhotoManager({ coupe, onClose, onChanged }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-6 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
+      <div className="w-full max-w-lg rounded-2xl border border-line bg-surface p-6">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-2xl text-ink">Photos — {coupe.nom}</h2>
-          <button onClick={onClose} className="text-ink/40 hover:text-ink"><FiX size={20} /></button>
+          <h2 className="font-display text-xl font-black uppercase tracking-tight text-white">Photos — {coupe.nom}</h2>
+          <button onClick={onClose} className="text-cream/40 hover:text-cream"><FiX size={20} /></button>
         </div>
-        <p className="mt-1 text-sm text-ink/50">
+        <p className="mt-1 text-sm text-cream/50">
           Chaque photo peut être ajoutée ou supprimée indépendamment, jusqu'à 3 au total.
         </p>
 
@@ -283,20 +285,20 @@ function PhotoManager({ coupe, onClose, onChanged }) {
           {[0, 1, 2].map((i) => {
             const photo = photos[i];
             return (
-              <div key={i} className="relative aspect-square overflow-hidden rounded-xl border border-ink/10 bg-plum-50">
+              <div key={i} className="relative aspect-square overflow-hidden rounded-xl border border-line bg-raised">
                 {photo ? (
                   <>
                     <img src={photo.url} alt="" className="h-full w-full object-cover" />
                     <button
                       onClick={() => handleDelete(photo.id)}
-                      className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-ink/70 text-white hover:bg-clay-600"
+                      className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white hover:bg-clay-600"
                       title="Supprimer cette photo"
                     >
                       <FiX size={14} />
                     </button>
                   </>
                 ) : (
-                  <div className="flex h-full items-center justify-center text-plum-200">
+                  <div className="flex h-full items-center justify-center text-cream/15">
                     <FiImage size={22} />
                   </div>
                 )}
@@ -317,9 +319,9 @@ function PhotoManager({ coupe, onClose, onChanged }) {
             className="input"
           />
           {photos.length >= 3 && (
-            <p className="mt-1 text-xs text-ink/40">Maximum atteint — supprimez une photo pour en ajouter une autre.</p>
+            <p className="mt-1 text-xs text-cream/40">Maximum atteint — supprimez une photo pour en ajouter une autre.</p>
           )}
-          {uploading && <p className="mt-1 text-xs text-plum-600">Envoi en cours…</p>}
+          {uploading && <p className="mt-1 text-xs text-gold-400">Envoi en cours…</p>}
         </div>
 
         <button onClick={onClose} className="btn-secondary mt-6 w-full">Terminer</button>

@@ -48,7 +48,7 @@ export default function AssistantsAdmin() {
     try {
       if (editingId) {
         const payload = { ...form };
-        if (!payload.password) delete payload.password; // ne change le mot de passe que s'il est renseigné
+        if (!payload.password) delete payload.password;
         await adminUpdateAssistant(editingId, payload);
       } else {
         await adminCreateAssistant(form);
@@ -75,12 +75,12 @@ export default function AssistantsAdmin() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-3xl text-ink">Assistants</h1>
+        <h1 className="font-display text-2xl font-black uppercase tracking-tight text-white">Assistants</h1>
         <button onClick={openCreate} className="btn-primary">
           <FiPlus /> Ajouter un assistant
         </button>
       </div>
-      <p className="mt-1 text-ink/50">
+      <p className="mt-1 text-cream/45">
         Chaque assistant a ses propres identifiants pour se connecter à son espace et voir ses rendez-vous.
       </p>
 
@@ -89,11 +89,11 @@ export default function AssistantsAdmin() {
       {loading ? (
         <Loader />
       ) : assistants.length === 0 ? (
-        <p className="mt-10 text-ink/50">Aucun assistant pour le moment.</p>
+        <p className="mt-10 text-cream/50">Aucun assistant pour le moment.</p>
       ) : (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-ink/10 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-ink/10 bg-ink/[0.02] text-xs uppercase tracking-wide text-ink/40">
+        <div className="mt-6 overflow-x-auto rounded-2xl border border-line bg-surface">
+          <table className="w-full min-w-[640px] text-left text-sm">
+            <thead className="border-b border-line bg-white/[0.02] text-xs uppercase font-black uppercase tracking-tight text-white/40">
               <tr>
                 <th className="px-4 py-3">Nom</th>
                 <th className="px-4 py-3">Contact</th>
@@ -103,21 +103,21 @@ export default function AssistantsAdmin() {
             </thead>
             <tbody>
               {assistants.map((a) => (
-                <tr key={a.id} className="border-b border-ink/5 last:border-0">
+                <tr key={a.id} className="border-b border-line/60 last:border-0">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-plum-100 text-plum-600">
+                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gold-500/15 text-gold-400">
                         <FiUser size={14} />
                       </span>
-                      <span className="font-medium text-ink">{a.prenom} {a.nom}</span>
+                      <span className="font-medium text-cream">{a.prenom} {a.nom}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-ink/60">
+                  <td className="px-4 py-3 text-cream/55">
                     <p>{a.email}</p>
-                    {a.telephone && <p className="text-xs text-ink/40">{a.telephone}</p>}
+                    {a.telephone && <p className="text-xs text-cream/40">{a.telephone}</p>}
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`badge ${a.actif ? 'bg-sage-500/15 text-sage-600' : 'bg-ink/10 text-ink/50'}`}>
+                    <span className={`badge ${a.actif ? 'bg-sage-500/15 text-sage-500' : 'bg-cream/10 text-cream/50'}`}>
                       {a.actif ? 'Actif' : 'Inactif'}
                     </span>
                   </td>
@@ -128,7 +128,7 @@ export default function AssistantsAdmin() {
                       </button>
                       <button
                         onClick={() => handleDelete(a.id)}
-                        className="flex items-center gap-1 rounded-full border border-clay-500/30 px-3 py-1.5 text-xs font-medium text-clay-600 hover:bg-clay-500/5"
+                        className="flex items-center gap-1 rounded-full border border-clay-500/40 px-3 py-1.5 text-xs font-medium text-clay-500 hover:bg-clay-500/10"
                       >
                         <FiTrash2 size={13} /> Supprimer
                       </button>
@@ -142,11 +142,13 @@ export default function AssistantsAdmin() {
       )}
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-6 backdrop-blur-sm">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-line bg-surface p-6">
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-2xl text-ink">{editingId ? "Modifier l'assistant" : 'Nouvel assistant'}</h2>
-              <button onClick={() => setShowForm(false)} className="text-ink/40 hover:text-ink"><FiX size={20} /></button>
+              <h2 className="font-display text-xl font-black uppercase tracking-tight text-white">
+                {editingId ? "Modifier l'assistant" : 'Nouvel assistant'}
+              </h2>
+              <button onClick={() => setShowForm(false)} className="text-cream/40 hover:text-cream"><FiX size={20} /></button>
             </div>
             <form onSubmit={handleSubmit} className="mt-5 space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
@@ -185,7 +187,7 @@ export default function AssistantsAdmin() {
                 />
               </div>
               {editingId && (
-                <label className="flex items-center gap-2 text-sm text-ink/70">
+                <label className="flex items-center gap-2 text-sm text-cream/70">
                   <input type="checkbox" checked={form.actif}
                     onChange={(e) => setForm({ ...form, actif: e.target.checked })} />
                   Compte actif (peut se connecter et être assigné à des RDV)
