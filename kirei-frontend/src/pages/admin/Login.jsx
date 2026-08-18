@@ -36,7 +36,7 @@ export default function Login() {
         <BarberPole style={{ '--pole-w': '16px', '--pole-h': '200px' }} />
       </div>
 
-      <div className="relative w-full max-w-sm border border-white/15 bg-coal p-8">
+      <div className="relative w-full max-w-sm rounded-2xl border border-white/15 bg-coal p-8">
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Emblem size={40} className="text-white" />

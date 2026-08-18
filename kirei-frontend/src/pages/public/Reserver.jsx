@@ -13,11 +13,12 @@ function todayIso() {
 }
 
 const itemBase =
-  'group relative border border-black/15 bg-white p-6 text-left transition-all duration-300 hover:border-black/60';
+  'group relative border border-black/15 p-6 text-left transition-all duration-300 hover:border-black/60';
 const itemActive = 'border-black bg-night text-white hover:border-night';
-const iconBase =
-  'flex h-12 w-12 items-center justify-center border border-black/20 text-night transition-colors duration-300 group-hover:border-night/60';
+const itemIdle = 'bg-white';
+const iconBase = 'flex h-12 w-12 items-center justify-center border transition-colors duration-300';
 const iconActive = 'border-white/30 text-white group-hover:border-white/60';
+const iconIdle = 'border-black/20 text-night group-hover:border-night/60';
 
 export default function Reserver() {
   const location = useLocation();
@@ -214,7 +215,7 @@ export default function Reserver() {
                         <button
                           key={c.id}
                           onClick={() => goToLieuStep(c.id)}
-                          className={`${itemBase} ${active ? itemActive : ''}`}
+                          className={`${itemBase} ${active ? itemActive : itemIdle}`}
                         >
                           <div className="flex items-center gap-4">
                             <div className="h-16 w-16 shrink-0 overflow-hidden border border-black/10 bg-paper">
@@ -247,9 +248,9 @@ export default function Reserver() {
                 <div className="mt-8 grid gap-4 sm:grid-cols-2">
                   <button
                     onClick={() => chooseLieu('SALON')}
-                    className={`${itemBase} ${lieu === 'SALON' ? itemActive : ''}`}
+                    className={`${itemBase} ${lieu === 'SALON' ? itemActive : itemIdle}`}
                   >
-                    <div className={`${iconBase} ${lieu === 'SALON' ? iconActive : ''}`}>
+                    <div className={`${iconBase} ${lieu === 'SALON' ? iconActive : iconIdle}`}>
                       <FiScissors size={22} />
                     </div>
                     <p className="mt-4 font-display text-2xl font-black uppercase tracking-tight">Au salon</p>
@@ -264,9 +265,9 @@ export default function Reserver() {
                   {domicileDisponible ? (
                     <button
                       onClick={() => chooseLieu('DOMICILE')}
-                      className={`${itemBase} ${lieu === 'DOMICILE' ? itemActive : ''}`}
+                      className={`${itemBase} ${lieu === 'DOMICILE' ? itemActive : itemIdle}`}
                     >
-                      <div className={`${iconBase} ${lieu === 'DOMICILE' ? iconActive : ''}`}>
+                      <div className={`${iconBase} ${lieu === 'DOMICILE' ? iconActive : iconIdle}`}>
                         <FiHome size={22} />
                       </div>
                       <p className="mt-4 font-display text-2xl font-black uppercase tracking-tight">À domicile</p>
@@ -300,12 +301,12 @@ export default function Reserver() {
                   <div className="mt-8 grid gap-4 sm:grid-cols-2">
                     <button
                       onClick={() => choosePraticien('')}
-                      className={`${itemBase} ${selectedAssistantId === '' ? itemActive : ''}`}
+                      className={`${itemBase} ${selectedAssistantId === '' ? itemActive : itemIdle}`}
                     >
-                      <div className={`${iconBase} ${selectedAssistantId === '' ? iconActive : ''}`}>
+                      <div className={`${iconBase} ${selectedAssistantId === '' ? iconActive : iconIdle}`}>
                         <FiUsers size={22} />
                       </div>
-                      <p className="mt-4 font-display text-2xl font-black uppercase tracking-tight">Aucune préférence</p>
+                      <p className="mt-4 font-display text-2xl font-black uppercase tracking-tight">SERGE — Le patron</p>
                       <p className={`mt-1 text-sm ${selectedAssistantId === '' ? 'text-white/60' : 'text-night/50'}`}>
                         Le coiffeur s'occupera de vous
                       </p>
@@ -317,9 +318,9 @@ export default function Reserver() {
                         <button
                           key={a.id}
                           onClick={() => choosePraticien(a.id)}
-                          className={`${itemBase} ${active ? itemActive : ''}`}
+                          className={`${itemBase} ${active ? itemActive : itemIdle}`}
                         >
-                          <div className={`${iconBase} ${active ? iconActive : ''}`}>
+                          <div className={`${iconBase} ${active ? iconActive : iconIdle}`}>
                             <FiUser size={22} />
                           </div>
                           <p className="mt-4 font-display text-2xl font-black uppercase tracking-tight">
@@ -342,7 +343,7 @@ export default function Reserver() {
                 <p className="mt-2 font-mono text-[10px] uppercase tracking-wide2 text-night/50">
                   {selectedCoupe?.nom} · {lieu === 'DOMICILE' ? 'À domicile' : 'Au salon'} · {tarifAffiche} FCFA
                   {' · '}
-                  {selectedAssistant ? `${selectedAssistant.prenom} ${selectedAssistant.nom}` : 'Aucune préférence'}
+                  {selectedAssistant ? `${selectedAssistant.prenom} ${selectedAssistant.nom}` : 'SERGE — Le patron'}
                 </p>
 
                 <div className="mt-8">
@@ -518,7 +519,7 @@ export default function Reserver() {
                 {recapRow('Lieu', lieu === 'DOMICILE' ? 'À domicile' : 'Au salon', false)}
                 {recapRow(
                   'Praticien',
-                  selectedAssistant ? `${selectedAssistant.prenom} ${selectedAssistant.nom}` : 'Aucune préférence',
+                  selectedAssistant ? `${selectedAssistant.prenom} ${selectedAssistant.nom}` : 'SERGE — Le patron',
                   false
                 )}
                 {recapRow('Date', dateAffichee || '—', false)}

@@ -8,7 +8,6 @@ import SectionHeading from '../../components/SectionHeading';
 import BookingCTA from '../../components/BookingCTA';
 import LightOverlay from '../../components/LightOverlay';
 import VideoSlot from '../../components/VideoSlot';
-import BarberPole from '../../components/BarberPole';
 import Loader from '../../components/Loader';
 import { FiArrowUpRight, FiMapPin, FiPhone } from 'react-icons/fi';
 
@@ -387,57 +386,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ============ 05 — RÉSERVATION ============ */}
-      <section className="line-texture relative overflow-hidden bg-night py-28 text-white md:py-40">
-        <LightOverlay dark />
-        <BarberPole
-          style={{ '--pole-w': '22px', '--pole-h': '280px' }}
-          className="pointer-events-none absolute left-8 top-1/2 hidden -translate-y-1/2 opacity-80 lg:block"
-        />
-
-        <div className="relative mx-auto max-w-[1400px] px-5 md:px-10">
-          <div className="flex flex-col items-start justify-between gap-12 lg:flex-row lg:items-end">
-            <div>
-              <p className="mono-label text-white/50">05 — Réservation</p>
-              <h2 className="mt-4 font-display font-black uppercase leading-[0.85] tracking-tight">
-                <RevealLines
-                  text={'PRÊT À\nRÉSERVER ?'}
-                  className="text-[clamp(1.5rem,3.6vw,3rem)]"
-                />
-              </h2>
-              <Reveal delay={250}>
-                <p className="mt-6 max-w-md text-sm leading-relaxed text-white/55">
-                  Choisissez votre prestation, votre praticien et votre créneau.
-                  Confirmation par e-mail en quelques minutes.
-                </p>
-              </Reveal>
-            </div>
-            <Reveal delay={350} variant="scale" className="self-end lg:self-auto">
-              <BookingCTA dark />
-            </Reveal>
-          </div>
-
-          <div className="mt-20 grid gap-8 border-t border-white/15 pt-8 font-mono text-[10px] uppercase tracking-wide2 text-white/50 sm:grid-cols-3">
-            <div className="flex flex-col gap-1.5">
-              <span className="text-white/25">Studio</span>
-              {salon?.nomEnseigne ? <span>{salon.nomEnseigne}</span> : <span>UltraBarber</span>}
-              {salon?.adresse && <span>{salon.adresse}</span>}
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <span className="text-white/25">Contact</span>
-              {salon?.telephone ? <span>{salon.telephone}</span> : <span>—</span>}
-              <span>Lun — Sam · 09h00 — 20h00</span>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <span className="text-white/25">En ligne</span>
-              <span>Réservation 24h/24 — 7j/7</span>
-              <Link to="/coupes" className="nav-link mt-2 w-fit text-white/60 hover:text-white">
-                Voir les prestations
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
+      </div>
   );
 }

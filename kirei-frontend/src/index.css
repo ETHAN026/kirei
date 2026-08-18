@@ -505,24 +505,24 @@
 
   /* ---------- Backoffice (utilitaires) ---------- */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 bg-gold-500 px-6 py-3 text-sm font-semibold text-night transition hover:bg-gold-400 disabled:opacity-40 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gold-500 px-6 py-3 text-sm font-semibold text-night transition hover:bg-gold-400 disabled:opacity-40 disabled:cursor-not-allowed;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 border border-line bg-raised px-6 py-3 text-sm font-medium text-cream transition hover:border-gold-400 hover:text-gold-300 disabled:opacity-40;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-raised px-6 py-3 text-sm font-medium text-cream transition hover:border-gold-400 hover:text-gold-300 disabled:opacity-40;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium text-cream/60 transition hover:bg-white/5 hover:text-cream;
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-cream/60 transition hover:bg-white/5 hover:text-cream;
   }
   .card {
-    @apply border border-line bg-surface p-6;
+    @apply rounded-2xl border border-line bg-surface p-6;
   }
   .input {
-    @apply w-full border border-line bg-raised px-4 py-2.5 text-sm text-cream placeholder:text-cream/30 focus:border-gold-300 focus:outline-none focus:ring-1 focus:ring-gold-300/40;
+    @apply w-full rounded-lg border border-line bg-raised px-4 py-2.5 text-sm text-cream placeholder:text-cream/30 focus:border-gold-300 focus:outline-none focus:ring-1 focus:ring-gold-300/40;
   }
   .label {
     @apply mb-1.5 block text-xs font-medium uppercase tracking-wide text-cream/45;
   }
   .badge {
-    @apply inline-flex items-center px-2.5 py-1 text-xs font-medium;
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium;
   }
 }

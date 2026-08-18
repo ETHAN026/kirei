@@ -14,7 +14,7 @@ const links = [
 ];
 
 const linkClass = ({ isActive }) =>
-  `flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition ${
+  `flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition ${
     isActive ? 'bg-cream text-night' : 'text-white/45 hover:bg-white/5 hover:text-white'
   }`;
 
