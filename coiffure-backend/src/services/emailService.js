@@ -3,11 +3,16 @@ const transporter = require('../config/mailer');
 const FROM = process.env.EMAIL_FROM || 'Salon Coiffure <no-reply@salon.com>';
 
 async function sendMail({ to, subject, html }) {
+  if (!to) {
+    console.warn('[mailer] Pas de destinataire — e-mail ignoré.');
+    return;
+  }
+  console.log(`[mailer] Envoi à ${to} — « ${subject} »`);
   try {
-    await transporter.sendMail({ from: FROM, to, subject, html });
+    const info = await transporter.sendMail({ from: FROM, to, subject, html });
+    console.log(`[mailer] ✅ Envoyé à ${to} (id: ${info.messageId})`);
   } catch (err) {
-    // On ne bloque jamais le flux métier si l'e-mail échoue : on logge seulement.
-    console.error('[mailer] échec envoi e-mail:', err.message);
+    console.error(`[mailer] ❌ Échec envoi à ${to}:`, err.message);
   }
 }
 
