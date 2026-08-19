@@ -139,8 +139,9 @@ async function changerStatut(req, res, statutCible, notifier) {
     include: RDV_INCLUDE,
   });
 
-  if (notifier) await notifier(updated);
+  // Réponse immédiate — l'e-mail part en arrière-plan
   res.json(updated);
+  if (notifier) notifier(updated).catch((e) => console.error('[mailer] échec notification:', e.message));
 }
 
 // PATCH /api/admin/rendez-vous/:id/valider  (EN_ATTENTE -> VALIDE)
