@@ -1,11 +1,8 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "framework": "vite",
   "rewrites": [
+    { "source": "/assets/(.*)", "destination": "/assets/$1" },
     { "source": "/images/(.*)", "destination": "/images/$1" },
     { "source": "/videos/(.*)", "destination": "/videos/$1" },
-    { "source": "/assets/(.*)", "destination": "/assets/$1" },
-    { "source": "/((?!assets|images|videos).*)", "destination": "/index.html" }
+    { "source": "/((?!assets|images|videos|favicon|icons).*?)$", "destination": "/index.html" }
   ]
 }
