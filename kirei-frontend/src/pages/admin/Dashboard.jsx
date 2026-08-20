@@ -28,18 +28,18 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-black uppercase tracking-tight text-white">Tableau de bord</h1>
+      <h1 className="font-display text-xl font-black uppercase tracking-tight text-white sm:text-2xl">Tableau de bord</h1>
       <p className="mt-1 text-cream/45">Chiffre d'affaires calculé sur les rendez-vous terminés (payés).</p>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
         {PERIODES.map((p) => (
-          <div key={p.key} className="card">
-            <p className="text-xs font-medium uppercase font-black uppercase tracking-tight text-white/40">{p.label}</p>
-            <p className="mt-2 font-display text-2xl text-gold-400">
-              {data.chiffreAffaires[p.key].total.toLocaleString('fr-FR')} <span className="text-sm">FCFA</span>
+          <div key={p.key} className="card !p-3 sm:!p-4">
+            <p className="text-[10px] font-medium uppercase font-black uppercase tracking-tight text-white/40 sm:text-xs">{p.label}</p>
+            <p className="mt-1 font-display text-lg text-gold-400 sm:mt-2 sm:text-2xl">
+              {data.chiffreAffaires[p.key].total.toLocaleString('fr-FR')} <span className="text-xs sm:text-sm">FCFA</span>
             </p>
-            <p className="mt-1 text-xs text-cream/40">
-              {data.chiffreAffaires[p.key].nombreRendezVous} rendez-vous
+            <p className="mt-0.5 text-[10px] text-cream/40 sm:mt-1 sm:text-xs">
+              {data.chiffreAffaires[p.key].nombreRendezVous} RDV
             </p>
           </div>
         ))}
@@ -48,22 +48,22 @@ export default function Dashboard() {
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="card flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium uppercase font-black uppercase tracking-tight text-white/40">En attente de validation</p>
-            <p className="mt-2 font-display text-3xl text-gold-300">{data.rendezVousEnAttente}</p>
+            <p className="text-[10px] font-medium uppercase font-black uppercase tracking-tight text-white/40 sm:text-xs">En attente</p>
+            <p className="mt-1 font-display text-2xl text-gold-300 sm:mt-2 sm:text-3xl">{data.rendezVousEnAttente}</p>
           </div>
-          <FiClock className="text-gold-400/70" size={28} />
+          <FiClock className="text-gold-400/70" size={24} />
         </div>
         <div className="card flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium uppercase font-black uppercase tracking-tight text-white/40">Validés, à venir</p>
-            <p className="mt-2 font-display text-3xl text-sage-500">{data.rendezVousValidesAVenir}</p>
+            <p className="text-[10px] font-medium uppercase font-black uppercase tracking-tight text-white/40 sm:text-xs">Validés, à venir</p>
+            <p className="mt-1 font-display text-2xl text-sage-500 sm:mt-2 sm:text-3xl">{data.rendezVousValidesAVenir}</p>
           </div>
-          <FiCalendar className="text-sage-500/70" size={28} />
+          <FiCalendar className="text-sage-500/70" size={24} />
         </div>
       </div>
 
       <div className="mt-8">
-        <h2 className="flex items-center gap-2 font-display text-lg font-black uppercase tracking-tight text-white">
+        <h2 className="flex items-center gap-2 font-display text-base font-black uppercase tracking-tight text-white sm:text-lg">
           <FiTrendingUp className="text-gold-400" /> Coupes les plus vendues
         </h2>
         {populaires.length === 0 ? (
@@ -73,14 +73,9 @@ export default function Dashboard() {
             {populaires.map((p) => (
               <div key={p.coupe?.id} className="card flex items-center justify-between !py-3">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 overflow-hidden rounded-lg bg-raised">
-                    {p.coupe?.photos?.[0] && (
-                      <img src={p.coupe.photos[0].url} alt="" className="h-full w-full object-cover" />
-                    )}
-                  </div>
-                  <p className="font-medium text-cream">{p.coupe?.nom}</p>
+                  <p className="font-medium text-cream text-sm">{p.coupe?.nom}</p>
                 </div>
-                <div className="text-right text-sm">
+                <div className="text-right text-xs sm:text-sm">
                   <p className="text-cream/55">{p.nombreVentes} ventes</p>
                   <p className="font-medium text-gold-400">{p.chiffreAffaires.toLocaleString('fr-FR')} FCFA</p>
                 </div>

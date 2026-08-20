@@ -27,10 +27,11 @@ export default function ClientsAdmin() {
 
   return (
     <div>
-      <h1 className="font-display text-lg font-black uppercase tracking-tight text-white">Clients</h1>
+      <h1 className="font-display text-xl font-black uppercase tracking-tight text-white sm:text-lg">Clients</h1>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-5">
-        <div className="overflow-x-auto rounded-2xl border border-line bg-surface lg:col-span-3">
+        {/* Desktop table */}
+        <div className="hidden overflow-x-auto rounded-2xl border border-line bg-surface lg:col-span-3 lg:block">
           <table className="w-full min-w-[480px] text-left text-sm">
             <thead className="border-b border-line bg-white/[0.02] text-xs uppercase font-black uppercase tracking-tight text-white/40">
               <tr>
@@ -61,6 +62,29 @@ export default function ClientsAdmin() {
           {clients.length === 0 && <p className="p-6 text-sm text-cream/50">Aucun client enregistré.</p>}
         </div>
 
+        {/* Mobile cards */}
+        <div className="space-y-3 lg:col-span-3 lg:hidden">
+          {clients.map((c) => (
+            <div key={c.id} className="rounded-2xl border border-line bg-surface p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="font-medium text-cream">{c.prenom} {c.nom}</p>
+                  <p className="text-xs text-cream/40">{c.telephone} · {c.email}</p>
+                </div>
+                <button onClick={() => openClient(c.id)} className="btn-ghost !py-1 !px-3 text-xs">
+                  Détails
+                </button>
+              </div>
+              <div className="mt-2 flex items-center gap-4 text-xs">
+                <span className="text-cream/50">{c.nombreRendezVous} RDV</span>
+                <span className="font-medium text-gold-400">{c.totalPaye.toLocaleString('fr-FR')} FCFA</span>
+              </div>
+            </div>
+          ))}
+          {clients.length === 0 && <p className="p-6 text-sm text-cream/50">Aucun client enregistré.</p>}
+        </div>
+
+        {/* Detail panel */}
         <div className="lg:col-span-2">
           {loadingDetail ? (
             <Loader />

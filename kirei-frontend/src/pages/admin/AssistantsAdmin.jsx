@@ -74,9 +74,9 @@ export default function AssistantsAdmin() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-black uppercase tracking-tight text-white">Assistants</h1>
-        <button onClick={openCreate} className="btn-primary">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="font-display text-xl font-black uppercase tracking-tight text-white sm:text-2xl">Assistants</h1>
+        <button onClick={openCreate} className="btn-primary self-start sm:self-auto">
           <FiPlus /> Ajouter un assistant
         </button>
       </div>
@@ -91,61 +91,98 @@ export default function AssistantsAdmin() {
       ) : assistants.length === 0 ? (
         <p className="mt-10 text-cream/50">Aucun assistant pour le moment.</p>
       ) : (
-        <div className="mt-6 overflow-x-auto rounded-2xl border border-line bg-surface">
-          <table className="w-full min-w-[640px] text-left text-sm">
-            <thead className="border-b border-line bg-white/[0.02] text-xs uppercase font-black uppercase tracking-tight text-white/40">
-              <tr>
-                <th className="px-4 py-3">Nom</th>
-                <th className="px-4 py-3">Contact</th>
-                <th className="px-4 py-3">Statut</th>
-                <th className="px-4 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {assistants.map((a) => (
-                <tr key={a.id} className="border-b border-line/60 last:border-0">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gold-500/15 text-gold-400">
-                        <FiUser size={14} />
-                      </span>
-                      <span className="font-medium text-cream">{a.prenom} {a.nom}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-cream/55">
-                    <p>{a.email}</p>
-                    {a.telephone && <p className="text-xs text-cream/40">{a.telephone}</p>}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`badge ${a.actif ? 'bg-sage-500/15 text-sage-500' : 'bg-cream/10 text-cream/50'}`}>
-                      {a.actif ? 'Actif' : 'Inactif'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end gap-2">
-                      <button onClick={() => openEdit(a)} className="btn-secondary !py-1.5 !px-3 text-xs">
-                        <FiEdit2 size={13} /> Modifier
-                      </button>
-                      <button
-                        onClick={() => handleDelete(a.id)}
-                        className="flex items-center gap-1 rounded-full border border-clay-500/40 px-3 py-1.5 text-xs font-medium text-clay-500 hover:bg-clay-500/10"
-                      >
-                        <FiTrash2 size={13} /> Supprimer
-                      </button>
-                    </div>
-                  </td>
+        <>
+          {/* Desktop table */}
+          <div className="mt-6 hidden overflow-x-auto rounded-2xl border border-line bg-surface md:block">
+            <table className="w-full min-w-[640px] text-left text-sm">
+              <thead className="border-b border-line bg-white/[0.02] text-xs uppercase font-black uppercase tracking-tight text-white/40">
+                <tr>
+                  <th className="px-4 py-3">Nom</th>
+                  <th className="px-4 py-3">Contact</th>
+                  <th className="px-4 py-3">Statut</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {assistants.map((a) => (
+                  <tr key={a.id} className="border-b border-line/60 last:border-0">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gold-500/15 text-gold-400">
+                          <FiUser size={14} />
+                        </span>
+                        <span className="font-medium text-cream">{a.prenom} {a.nom}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-cream/55">
+                      <p>{a.email}</p>
+                      {a.telephone && <p className="text-xs text-cream/40">{a.telephone}</p>}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`badge ${a.actif ? 'bg-sage-500/15 text-sage-500' : 'bg-cream/10 text-cream/50'}`}>
+                        {a.actif ? 'Actif' : 'Inactif'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => openEdit(a)} className="btn-secondary !py-1.5 !px-3 text-xs">
+                          <FiEdit2 size={13} /> Modifier
+                        </button>
+                        <button
+                          onClick={() => handleDelete(a.id)}
+                          className="flex items-center gap-1 rounded-full border border-clay-500/40 px-3 py-1.5 text-xs font-medium text-clay-500 hover:bg-clay-500/10"
+                        >
+                          <FiTrash2 size={13} /> Supprimer
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile cards */}
+          <div className="mt-6 space-y-3 md:hidden">
+            {assistants.map((a) => (
+              <div key={a.id} className="rounded-2xl border border-line bg-surface p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold-500/15 text-gold-400">
+                      <FiUser size={15} />
+                    </span>
+                    <div>
+                      <p className="font-medium text-cream">{a.prenom} {a.nom}</p>
+                      <p className="text-xs text-cream/40">{a.email}</p>
+                      {a.telephone && <p className="text-xs text-cream/40">{a.telephone}</p>}
+                    </div>
+                  </div>
+                  <span className={`badge shrink-0 ${a.actif ? 'bg-sage-500/15 text-sage-500' : 'bg-cream/10 text-cream/50'}`}>
+                    {a.actif ? 'Actif' : 'Inactif'}
+                  </span>
+                </div>
+                <div className="mt-3 flex gap-2 border-t border-line pt-3">
+                  <button onClick={() => openEdit(a)} className="btn-secondary flex-1 !py-1.5 text-xs">
+                    <FiEdit2 size={13} /> Modifier
+                  </button>
+                  <button
+                    onClick={() => handleDelete(a.id)}
+                    className="flex flex-1 items-center justify-center gap-1 rounded-full border border-clay-500/40 px-3 py-1.5 text-xs font-medium text-clay-500 hover:bg-clay-500/10"
+                  >
+                    <FiTrash2 size={13} /> Supprimer
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-line bg-surface p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm sm:px-6">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-line bg-surface p-5 sm:p-6">
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-xl font-black uppercase tracking-tight text-white">
+              <h2 className="font-display text-lg font-black uppercase tracking-tight text-white sm:text-xl">
                 {editingId ? "Modifier l'assistant" : 'Nouvel assistant'}
               </h2>
               <button onClick={() => setShowForm(false)} className="text-cream/40 hover:text-cream"><FiX size={20} /></button>

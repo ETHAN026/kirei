@@ -90,9 +90,9 @@ export default function CoupesAdmin() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-black uppercase tracking-tight text-white">Coupes &amp; prestations</h1>
-        <button onClick={openCreate} className="btn-primary">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="font-display text-xl font-black uppercase tracking-tight text-white sm:text-2xl">Coupes &amp; prestations</h1>
+        <button onClick={openCreate} className="btn-primary self-start sm:self-auto">
           <FiPlus /> Ajouter une coupe
         </button>
       </div>
@@ -102,7 +102,7 @@ export default function CoupesAdmin() {
       {loading ? (
         <Loader />
       ) : (
-        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
           {coupes.map((c) => (
             <div key={c.id} className="overflow-hidden rounded-2xl border border-line bg-surface p-5">
               <div className="flex items-center justify-between gap-2">
@@ -135,8 +135,8 @@ export default function CoupesAdmin() {
 
       {/* Modal : formulaire infos coupe */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-line bg-surface p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm sm:px-6">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-line bg-surface p-5 sm:p-6">
             <div className="flex items-center justify-between">
               <h2 className="font-display text-xl font-black uppercase tracking-tight text-white">
                 {editingId ? 'Modifier la coupe' : 'Nouvelle coupe'}

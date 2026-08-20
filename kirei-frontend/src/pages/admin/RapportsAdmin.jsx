@@ -27,12 +27,12 @@ export default function RapportsAdmin() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-black uppercase tracking-tight text-white">Rapports financiers</h1>
+      <h1 className="font-display text-xl font-black uppercase tracking-tight text-white sm:text-2xl">Rapports financiers</h1>
       <p className="mt-1 text-cream/45">
         Export des rendez-vous terminés (payés) sur la période sélectionnée.
       </p>
 
-      <div className="card mt-6 max-w-xl">
+      <div className="card mt-6 max-w-xl overflow-x-auto">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="label">Du</label>

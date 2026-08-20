@@ -175,8 +175,8 @@ export default function ParametresAdmin() {
         <h2 className="font-display text-lg font-black uppercase tracking-tight text-white">Horaires d'ouverture</h2>
         <div className="mt-4 space-y-3">
           {horaires.map((h) => (
-            <div key={h.jourSemaine} className="flex flex-wrap items-center gap-3">
-              <span className="w-24 text-sm font-medium text-cream">{JOURS[h.jourSemaine]}</span>
+            <div key={h.jourSemaine} className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <span className="w-20 text-xs font-medium text-cream sm:w-24 sm:text-sm">{JOURS[h.jourSemaine]}</span>
               <label className="flex items-center gap-1.5 text-xs text-cream/60">
                 <input type="checkbox" checked={h.ferme}
                   onChange={(e) => updateHoraire(h.jourSemaine, 'ferme', e.target.checked)} />
@@ -184,10 +184,10 @@ export default function ParametresAdmin() {
               </label>
               {!h.ferme && (
                 <>
-                  <input type="time" className="input !w-32" value={h.heureDebut}
+                  <input type="time" className="input !w-24 sm:!w-32" value={h.heureDebut}
                     onChange={(e) => updateHoraire(h.jourSemaine, 'heureDebut', e.target.value)} />
                   <span className="text-cream/40">à</span>
-                  <input type="time" className="input !w-32" value={h.heureFin}
+                  <input type="time" className="input !w-24 sm:!w-32" value={h.heureFin}
                     onChange={(e) => updateHoraire(h.jourSemaine, 'heureFin', e.target.value)} />
                 </>
               )}
@@ -203,13 +203,13 @@ export default function ParametresAdmin() {
       <section className="card">
         <h2 className="font-display text-lg font-black uppercase tracking-tight text-white">Congés &amp; indisponibilités</h2>
         <form onSubmit={handleAddIndispo} className="mt-4 grid gap-3 sm:grid-cols-4">
-          <div>
+          <div className="sm:col-span-2">
             <label className="label">Début</label>
             <input required type="datetime-local" className="input"
               value={newIndispo.dateDebut}
               onChange={(e) => setNewIndispo({ ...newIndispo, dateDebut: e.target.value })} />
           </div>
-          <div>
+          <div className="sm:col-span-2">
             <label className="label">Fin</label>
             <input required type="datetime-local" className="input"
               value={newIndispo.dateFin}
