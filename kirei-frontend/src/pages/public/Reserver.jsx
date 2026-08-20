@@ -219,16 +219,13 @@ export default function Reserver() {
                           className={`${itemBase} ${active ? itemActive : itemIdle}`}
                         >
                           <div className="flex items-center gap-4">
-                            <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${active ? 'bg-white/10' : 'bg-[#2F54C4]/10'}`}>
-                              <FiScissors size={20} className={active ? 'text-white' : 'text-[#2F54C4]'} />
-                            </div>
-                            <div>
+                            <div className="flex-1">
                               <p className="font-display text-xl font-black uppercase tracking-tight">{c.nom}</p>
                               <p className={`mt-1 font-mono text-[10px] uppercase tracking-wide2 ${active ? 'text-white/60' : 'text-night/50'}`}>
                                 {c.prixFcfa} FCFA
                               </p>
                             </div>
-                            <FiArrowRight className={`ml-auto transition-colors ${active ? 'text-white' : 'text-night/30 group-hover:text-[#2F54C4]'}`} size={18} />
+                            <FiArrowRight className={`transition-colors ${active ? 'text-white' : 'text-night/30 group-hover:text-[#2F54C4]'}`} size={18} />
                           </div>
                         </button>
                       );
