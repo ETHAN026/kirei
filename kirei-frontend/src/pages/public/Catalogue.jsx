@@ -59,7 +59,7 @@ export default function Catalogue() {
               {services.map((s, i) => (
                 <img
                   key={s.id}
-                  src={s.photos?.[0]?.url || `https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=900&auto=format&fit=crop`}
+                  src={s.photos?.[0]?.url || `/images/gallery-01.jpg`}
                   alt=""
                   aria-hidden
                   loading="lazy"

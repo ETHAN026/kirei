@@ -11,23 +11,20 @@ import VideoSlot from '../../components/VideoSlot';
 import Loader from '../../components/Loader';
 import { FiArrowUpRight, FiMapPin, FiPhone } from 'react-icons/fi';
 
-/* ============ SLOTS VIDÉO (à remplacer par vos fichiers) ============ */
-/* Déposez vos vidéos dans : public/videos/                              */
-const SALON_VIDEO = '/videos/salon.mp4'; // section "Le studio"
-/* ==================================================================== */
-
-const HERO_IMG =
-  'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1200&auto=format&fit=crop';
-const SALON_IMG =
-  'https://images.unsplash.com/photo-1521708345571-5ddb6084b0b1?q=80&w=1600&auto=format&fit=crop';
+/* ============ MÉDIAS LOCAUX ============ */
+const SALON_VIDEO = '/videos/salon.mp4';
+const HERO_IMG = '/images/hero.jpg';
+const SALON_IMG = '/images/salon.jpg';
 
 const GALLERY_FALLBACKS = [
-  'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1200&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=1200&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1200&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=1200&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=1200&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1521727857535-28d2047314ac?q=80&w=1200&auto=format&fit=crop',
+  '/images/gallery-01.jpg',
+  '/images/gallery-02.jpg',
+  '/images/gallery-03.jpg',
+  '/images/gallery-04.jpg',
+  '/images/gallery-05.jpg',
+  '/images/gallery-06.jpg',
+  '/images/gallery-07.jpg',
+  '/images/gallery-08.jpg',
 ];
 
 const FALLBACK_SERVICES = [
@@ -182,7 +179,7 @@ export default function Home() {
       : []),
     ...GALLERY_FALLBACKS.map((img, i) => ({
       img,
-      caption: ['Session fade', 'Travail de dégradé', 'Lignes & contours', 'Texture', 'Finitions', 'Atelier'][i],
+      caption: ['Session fade', 'Travail de dégradé', 'Lignes & contours', 'Texture', 'Finitions', 'Atelier', 'Détails', 'Style'][i],
       w: ['min(40vw, 620px)', 'min(26vw, 420px)', 'min(32vw, 500px)'][i % 3],
       tall: i % 2 === 0,
     })),
