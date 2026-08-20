@@ -13,18 +13,19 @@ function todayIso() {
 }
 
 const itemBase =
-  'group relative border border-black/15 p-6 text-left transition-all duration-300 hover:border-black/60';
-const itemActive = 'border-black bg-night text-white hover:border-night';
-const itemIdle = 'bg-white';
-const iconBase = 'flex h-12 w-12 items-center justify-center border transition-colors duration-300';
-const iconActive = 'border-white/30 text-white group-hover:border-white/60';
-const iconIdle = 'border-black/20 text-night group-hover:border-night/60';
+  'group relative rounded-2xl border p-6 text-left transition-all duration-300';
+const itemActive = 'border-[#2F54C4] bg-night text-white shadow-lg shadow-[#2F54C4]/10';
+const itemIdle = 'bg-white border-black/10 hover:border-[#2F54C4]/40 hover:shadow-md';
+const iconBase = 'flex h-12 w-12 items-center justify-center rounded-xl border transition-colors duration-300';
+const iconActive = 'border-white/30 text-white';
+const iconIdle = 'border-[#2F54C4]/20 text-[#2F54C4]';
 
 export default function Reserver() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [step, setStep] = useState(0);
+  const hasCoupeId = Boolean(location.state?.coupeId);
+  const [step, setStep] = useState(hasCoupeId ? 1 : 0);
   const [coupes, setCoupes] = useState([]);
   const [loadingCoupes, setLoadingCoupes] = useState(true);
   const [selectedCoupeId, setSelectedCoupeId] = useState(location.state?.coupeId || null);
@@ -149,7 +150,7 @@ export default function Reserver() {
       {/* En-tête éditorial */}
       <div className="flex flex-col justify-between gap-6 border-b border-black/15 pb-10 md:flex-row md:items-end">
         <div>
-          <p className="mono-label fade-up text-night/50" style={{ '--d': '0.1s' }}>
+          <p className="mono-label fade-up text-clay-500" style={{ '--d': '0.1s' }}>
             Réservation — No° 03
           </p>
           <h1 className="hero-line mt-4 font-display font-black uppercase leading-[0.85] tracking-tight text-night">
@@ -165,7 +166,7 @@ export default function Reserver() {
 
       {/* Résumé mobile */}
       {step > 0 && step < 5 && (
-        <div className="mt-5 flex items-center justify-between gap-4 border border-black/15 bg-white px-4 py-3 font-mono text-[10px] uppercase tracking-wide2 text-night/60 lg:hidden">
+        <div className="mt-5 flex items-center justify-between gap-4 rounded-2xl border border-[#2F54C4]/20 bg-white px-4 py-3 font-mono text-[10px] uppercase tracking-wide2 text-night/60 lg:hidden">
           <span className="truncate">
             {selectedCoupe?.nom || '—'} · {tarifAffiche ?? '—'} FCFA
           </span>
@@ -183,8 +184,8 @@ export default function Reserver() {
             {STEPS.map((label, i) => (
               <li key={label} className="flex flex-1 items-center last:flex-none">
                 <span
-                  className={`flex h-7 w-7 shrink-0 items-center justify-center font-mono text-[10px] transition-colors duration-500 ${
-                    i <= step ? 'bg-night text-white' : 'border border-black/15 text-night/35'
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-[10px] transition-colors duration-500 ${
+                    i <= step ? 'bg-[#2F54C4] text-white' : 'border border-black/15 text-night/35'
                   }`}
                   aria-current={i === step ? 'step' : undefined}
                 >
@@ -194,7 +195,7 @@ export default function Reserver() {
                   {label}
                 </span>
                 {i < STEPS.length - 1 && (
-                  <div className={`mx-3 h-px flex-1 transition-colors duration-500 ${i < step ? 'bg-night' : 'bg-black/15'}`} />
+                  <div className={`mx-3 h-px flex-1 transition-colors duration-500 ${i < step ? 'bg-[#2F54C4]' : 'bg-black/15'}`} />
                 )}
               </li>
             ))}
@@ -218,10 +219,8 @@ export default function Reserver() {
                           className={`${itemBase} ${active ? itemActive : itemIdle}`}
                         >
                           <div className="flex items-center gap-4">
-                            <div className="h-16 w-16 shrink-0 overflow-hidden border border-black/10 bg-paper">
-                              {c.photos?.[0] && (
-                                <img src={c.photos[0].url} alt={c.nom} className="img-bw h-full w-full object-cover" />
-                              )}
+                            <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${active ? 'bg-white/10' : 'bg-[#2F54C4]/10'}`}>
+                              <FiScissors size={20} className={active ? 'text-white' : 'text-[#2F54C4]'} />
                             </div>
                             <div>
                               <p className="font-display text-xl font-black uppercase tracking-tight">{c.nom}</p>
@@ -229,7 +228,7 @@ export default function Reserver() {
                                 {c.prixFcfa} FCFA
                               </p>
                             </div>
-                            <FiArrowRight className={`ml-auto ${active ? 'text-white' : 'text-night/30'}`} size={18} />
+                            <FiArrowRight className={`ml-auto transition-colors ${active ? 'text-white' : 'text-night/30 group-hover:text-[#2F54C4]'}`} size={18} />
                           </div>
                         </button>
                       );
@@ -242,7 +241,13 @@ export default function Reserver() {
             {/* Étape 2 : lieu de la prestation */}
             {step === 1 && (
               <div>
-                {backBtn(0, 'Changer de coupe')}
+                {hasCoupeId ? (
+                  <button onClick={() => navigate('/')} className="btn-underline group mb-6 text-night/60 hover:text-night">
+                    <FiArrowLeft className="transition-transform duration-300 group-hover:-translate-x-1" /> Retour à l'accueil
+                  </button>
+                ) : (
+                  backBtn(0, 'Changer de coupe')
+                )}
                 {stepTitle('Où souhaitez-vous être coiffé(e) ?', '02 — Lieu de la prestation')}
 
                 <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -279,7 +284,7 @@ export default function Reserver() {
                       </p>
                     </button>
                   ) : (
-                    <div className="border border-dashed border-black/20 p-6 text-left text-night/35">
+                    <div className="rounded-2xl border border-dashed border-black/15 p-6 text-left text-night/35">
                       <FiHome size={22} />
                       <p className="mt-4 font-display text-2xl font-black uppercase tracking-tight">À domicile</p>
                       <p className="mt-1 text-sm">Non proposée pour cette coupe</p>
@@ -339,7 +344,7 @@ export default function Reserver() {
             {step === 3 && (
               <div>
                 {backBtn(2, 'Changer de praticien')}
-                {stepTitle('Choisissez la date et l’heure', '04 — Créneaux disponibles')}
+                {stepTitle('Choisissez la date et l\'heure', '04 — Créneaux disponibles')}
                 <p className="mt-2 font-mono text-[10px] uppercase tracking-wide2 text-night/50">
                   {selectedCoupe?.nom} · {lieu === 'DOMICILE' ? 'À domicile' : 'Au salon'} · {tarifAffiche} FCFA
                   {' · '}
@@ -353,7 +358,7 @@ export default function Reserver() {
                     value={date}
                     min={todayIso()}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full max-w-xs border border-black/15 bg-white px-4 py-3 text-sm text-night focus:border-night focus:outline-none"
+                    className="w-full max-w-xs rounded-xl border border-black/15 bg-white px-4 py-3 text-sm text-night focus:border-[#2F54C4] focus:outline-none focus:ring-1 focus:ring-[#2F54C4]/40"
                   />
                 </div>
 
@@ -376,8 +381,8 @@ export default function Reserver() {
                           <button
                             key={c.debut}
                             onClick={() => setSelectedCreneau(c)}
-                            className={`border px-3 py-2.5 font-mono text-xs transition ${
-                              active ? 'border-night bg-night text-white' : 'border-black/15 bg-white text-night/70 hover:border-black/60'
+                            className={`rounded-xl border px-3 py-2.5 font-mono text-xs transition ${
+                              active ? 'border-[#2F54C4] bg-[#2F54C4] text-white' : 'border-black/10 bg-white text-night/70 hover:border-[#2F54C4]/40'
                             }`}
                           >
                             {heure}
@@ -406,7 +411,7 @@ export default function Reserver() {
                       <label className="mb-2 block font-mono text-[10px] uppercase tracking-wide2 text-night/50">Prénom</label>
                       <input
                         required
-                        className="w-full border border-black/15 bg-white px-4 py-3 text-sm text-night placeholder:text-night/30 focus:border-night focus:outline-none"
+                        className="w-full rounded-xl border border-black/15 bg-white px-4 py-3 text-sm text-night placeholder:text-night/30 focus:border-[#2F54C4] focus:outline-none focus:ring-1 focus:ring-[#2F54C4]/40"
                         value={form.prenom}
                         onChange={(e) => setForm({ ...form, prenom: e.target.value })}
                       />
@@ -415,7 +420,7 @@ export default function Reserver() {
                       <label className="mb-2 block font-mono text-[10px] uppercase tracking-wide2 text-night/50">Nom</label>
                       <input
                         required
-                        className="w-full border border-black/15 bg-white px-4 py-3 text-sm text-night placeholder:text-night/30 focus:border-night focus:outline-none"
+                        className="w-full rounded-xl border border-black/15 bg-white px-4 py-3 text-sm text-night placeholder:text-night/30 focus:border-[#2F54C4] focus:outline-none focus:ring-1 focus:ring-[#2F54C4]/40"
                         value={form.nom}
                         onChange={(e) => setForm({ ...form, nom: e.target.value })}
                       />
@@ -425,7 +430,7 @@ export default function Reserver() {
                     <label className="mb-2 block font-mono text-[10px] uppercase tracking-wide2 text-night/50">Téléphone</label>
                     <input
                       required
-                      className="w-full border border-black/15 bg-white px-4 py-3 text-sm text-night placeholder:text-night/30 focus:border-night focus:outline-none"
+                      className="w-full rounded-xl border border-black/15 bg-white px-4 py-3 text-sm text-night placeholder:text-night/30 focus:border-[#2F54C4] focus:outline-none focus:ring-1 focus:ring-[#2F54C4]/40"
                       value={form.telephone}
                       onChange={(e) => setForm({ ...form, telephone: e.target.value })}
                     />
@@ -435,7 +440,7 @@ export default function Reserver() {
                     <input
                       required
                       type="email"
-                      className="w-full border border-black/15 bg-white px-4 py-3 text-sm text-night placeholder:text-night/30 focus:border-night focus:outline-none"
+                      className="w-full rounded-xl border border-black/15 bg-white px-4 py-3 text-sm text-night placeholder:text-night/30 focus:border-[#2F54C4] focus:outline-none focus:ring-1 focus:ring-[#2F54C4]/40"
                       value={form.email}
                       onChange={(e) => setForm({ ...form, email: e.target.value })}
                     />
@@ -448,7 +453,7 @@ export default function Reserver() {
                       </label>
                       <input
                         required
-                        className="w-full border border-black/15 bg-white px-4 py-3 text-sm text-night placeholder:text-night/30 focus:border-night focus:outline-none"
+                        className="w-full rounded-xl border border-black/15 bg-white px-4 py-3 text-sm text-night placeholder:text-night/30 focus:border-[#2F54C4] focus:outline-none focus:ring-1 focus:ring-[#2F54C4]/40"
                         value={form.adresseDomicile}
                         placeholder="Quartier, rue, indication d'accès…"
                         onChange={(e) => setForm({ ...form, adresseDomicile: e.target.value })}
@@ -460,7 +465,7 @@ export default function Reserver() {
                         Adresse (optionnel)
                       </label>
                       <input
-                        className="w-full border border-black/15 bg-white px-4 py-3 text-sm text-night placeholder:text-night/30 focus:border-night focus:outline-none"
+                        className="w-full rounded-xl border border-black/15 bg-white px-4 py-3 text-sm text-night placeholder:text-night/30 focus:border-[#2F54C4] focus:outline-none focus:ring-1 focus:ring-[#2F54C4]/40"
                         value={form.adresse}
                         onChange={(e) => setForm({ ...form, adresse: e.target.value })}
                       />
@@ -479,7 +484,7 @@ export default function Reserver() {
             {/* Étape 6 : confirmation */}
             {step === 5 && confirmedRdv && (
               <div className="text-center">
-                <div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center bg-night text-white">
+                <div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-full bg-[#2F54C4] text-white">
                   <FiCheck size={30} />
                 </div>
                 <h2 className="font-display text-[clamp(1.5rem,3vw,2.2rem)] font-black uppercase leading-[0.95] tracking-tight text-night">
@@ -503,12 +508,12 @@ export default function Reserver() {
 
         {/* Récapitulatif sticky (desktop) */}
         <aside className="hidden lg:block" aria-label="Récapitulatif">
-          <div className="sticky top-24 bg-night px-6 py-7 text-white">
+          <div className="sticky top-24 rounded-2xl bg-night px-6 py-7 text-white">
             <div className="flex items-center justify-between">
               <p className="mono-label text-white/50">Récapitulatif</p>
               <BarberPole style={{ '--pole-w': '10px', '--pole-h': '26px' }} />
             </div>
-            {step === 0 ? (
+            {(step === 0 && !hasCoupeId) ? (
               <p className="mt-6 font-mono text-[10px] uppercase leading-relaxed tracking-wide2 text-white/35">
                 Votre sélection apparaîtra ici, étape par étape.
               </p>

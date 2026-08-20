@@ -423,8 +423,8 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.14);
   }
   .service-row:hover {
-    background: linear-gradient(90deg, rgba(198, 59, 53, 0.1) 0%, #000 30%);
-    color: #fff;
+    background: linear-gradient(90deg, #fff 0%, rgba(47, 84, 196, 0.15) 100%);
+    color: #000;
     padding-left: clamp(12px, 3.5vw, 42px);
   }
   .service-row .row-arrow {

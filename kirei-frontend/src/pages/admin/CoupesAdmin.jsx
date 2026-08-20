@@ -1,15 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   adminGetCoupes,
   adminCreateCoupe,
   adminUpdateCoupe,
   adminDeleteCoupe,
-  adminAddCoupePhoto,
-  adminDeleteCoupePhoto,
 } from '../../api/admin';
 import Loader from '../../components/Loader';
 import { ErrorMessage } from '../../components/Messages';
-import { FiPlus, FiEdit2, FiTrash2, FiImage, FiX, FiHome } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiHome } from 'react-icons/fi';
 
 const EMPTY_FORM = { nom: '', description: '', prixFcfa: '', actif: true, domicileDisponible: false, prixDomicileFcfa: '' };
 
@@ -22,8 +20,6 @@ export default function CoupesAdmin() {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
-
-  const [photoManagerCoupe, setPhotoManagerCoupe] = useState(null);
 
   async function load() {
     setLoading(true);
@@ -68,10 +64,9 @@ export default function CoupesAdmin() {
       if (editingId) {
         await adminUpdateCoupe(editingId, payload);
       } else {
-        const created = await adminCreateCoupe(payload);
+        await adminCreateCoupe(payload);
         setShowForm(false);
         await load();
-        setPhotoManagerCoupe(created);
         return;
       }
       setShowForm(false);
@@ -93,12 +88,6 @@ export default function CoupesAdmin() {
     }
   }
 
-  async function refreshPhotoManager(coupeId) {
-    const updated = await adminGetCoupes();
-    setCoupes(updated);
-    setPhotoManagerCoupe(updated.find((c) => c.id === coupeId) || null);
-  }
-
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -115,44 +104,29 @@ export default function CoupesAdmin() {
       ) : (
         <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {coupes.map((c) => (
-            <div key={c.id} className="overflow-hidden rounded-2xl border border-line bg-surface">
-              <div className="grid grid-cols-3 gap-px bg-line">
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="flex aspect-square items-center justify-center bg-raised">
-                    {c.photos?.[i] ? (
-                      <img src={c.photos[i].url} alt="" className="h-full w-full object-cover" />
-                    ) : (
-                      <FiImage className="text-cream/15" size={20} />
-                    )}
-                  </div>
-                ))}
+            <div key={c.id} className="overflow-hidden rounded-2xl border border-line bg-surface p-5">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-display text-xl font-black uppercase tracking-tight text-white">{c.nom}</p>
+                {!c.actif && <span className="badge bg-cream/10 text-cream/50">Inactif</span>}
               </div>
-              <div className="p-4">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="font-display text-xl font-black uppercase tracking-tight text-white">{c.nom}</p>
-                  {!c.actif && <span className="badge bg-cream/10 text-cream/50">Inactif</span>}
-                </div>
-                <p className="mt-1 text-sm font-semibold text-gold-400">{c.prixFcfa} FCFA</p>
-                {c.domicileDisponible && (
-                  <p className="mt-0.5 flex items-center gap-1 text-xs text-gold-300">
-                    <FiHome size={12} /> Domicile : {c.prixDomicileFcfa} FCFA
-                  </p>
-                )}
+              <p className="mt-1 text-sm font-semibold text-gold-400">{c.prixFcfa} FCFA</p>
+              {c.description && <p className="mt-1 text-xs text-cream/50">{c.description}</p>}
+              {c.domicileDisponible && (
+                <p className="mt-1 flex items-center gap-1 text-xs text-gold-300">
+                  <FiHome size={12} /> Domicile : {c.prixDomicileFcfa} FCFA
+                </p>
+              )}
 
-                <div className="mt-4 grid grid-cols-3 gap-2">
-                  <button onClick={() => openEdit(c)} className="btn-secondary !py-1.5 !px-2 text-xs">
-                    <FiEdit2 size={13} /> Modifier
-                  </button>
-                  <button onClick={() => setPhotoManagerCoupe(c)} className="btn-secondary !py-1.5 !px-2 text-xs">
-                    <FiImage size={13} /> Photos
-                  </button>
-                  <button
-                    onClick={() => handleDelete(c.id)}
-                    className="flex items-center justify-center gap-1 rounded-full border border-clay-500/40 px-2 py-1.5 text-xs font-medium text-clay-500 hover:bg-clay-500/10"
-                  >
-                    <FiTrash2 size={13} /> Suppr.
-                  </button>
-                </div>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <button onClick={() => openEdit(c)} className="btn-secondary !py-1.5 !px-2 text-xs">
+                  <FiEdit2 size={13} /> Modifier
+                </button>
+                <button
+                  onClick={() => handleDelete(c.id)}
+                  className="flex items-center justify-center gap-1 rounded-full border border-clay-500/40 px-2 py-1.5 text-xs font-medium text-clay-500 hover:bg-clay-500/10"
+                >
+                  <FiTrash2 size={13} /> Suppr.
+                </button>
               </div>
             </div>
           ))}
@@ -207,10 +181,6 @@ export default function CoupesAdmin() {
                 Visible dans le catalogue client
               </label>
 
-              {!editingId && (
-                <p className="text-xs text-cream/40">Vous pourrez ajouter les photos juste après la création.</p>
-              )}
-
               <ErrorMessage>{error}</ErrorMessage>
 
               <div className="flex gap-3 pt-2">
@@ -226,106 +196,6 @@ export default function CoupesAdmin() {
         </div>
       )}
 
-      {/* Modal : gestion indépendante des photos */}
-      {photoManagerCoupe && (
-        <PhotoManager
-          coupe={photoManagerCoupe}
-          onClose={() => setPhotoManagerCoupe(null)}
-          onChanged={() => refreshPhotoManager(photoManagerCoupe.id)}
-        />
-      )}
-    </div>
-  );
-}
-
-function PhotoManager({ coupe, onClose, onChanged }) {
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState('');
-  const inputRef = useRef(null);
-  const photos = coupe.photos || [];
-
-  async function handleFileChange(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    setError('');
-    setUploading(true);
-    try {
-      await adminAddCoupePhoto(coupe.id, file);
-      await onChanged();
-    } catch (err) {
-      setError(err.response?.data?.error || "Ajout de la photo impossible.");
-    } finally {
-      setUploading(false);
-      if (inputRef.current) inputRef.current.value = '';
-    }
-  }
-
-  async function handleDelete(photoId) {
-    setError('');
-    try {
-      await adminDeleteCoupePhoto(coupe.id, photoId);
-      await onChanged();
-    } catch (err) {
-      setError(err.response?.data?.error || 'Suppression impossible.');
-    }
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-line bg-surface p-6">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl font-black uppercase tracking-tight text-white">Photos — {coupe.nom}</h2>
-          <button onClick={onClose} className="text-cream/40 hover:text-cream"><FiX size={20} /></button>
-        </div>
-        <p className="mt-1 text-sm text-cream/50">
-          Chaque photo peut être ajoutée ou supprimée indépendamment, jusqu'à 3 au total.
-        </p>
-
-        <div className="mt-5 grid grid-cols-3 gap-3">
-          {[0, 1, 2].map((i) => {
-            const photo = photos[i];
-            return (
-              <div key={i} className="relative aspect-square overflow-hidden rounded-xl border border-line bg-raised">
-                {photo ? (
-                  <>
-                    <img src={photo.url} alt="" className="h-full w-full object-cover" />
-                    <button
-                      onClick={() => handleDelete(photo.id)}
-                      className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white hover:bg-clay-600"
-                      title="Supprimer cette photo"
-                    >
-                      <FiX size={14} />
-                    </button>
-                  </>
-                ) : (
-                  <div className="flex h-full items-center justify-center text-cream/15">
-                    <FiImage size={22} />
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        <ErrorMessage>{error}</ErrorMessage>
-
-        <div className="mt-5">
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/png, image/jpeg, image/webp"
-            onChange={handleFileChange}
-            disabled={photos.length >= 3 || uploading}
-            className="input"
-          />
-          {photos.length >= 3 && (
-            <p className="mt-1 text-xs text-cream/40">Maximum atteint — supprimez une photo pour en ajouter une autre.</p>
-          )}
-          {uploading && <p className="mt-1 text-xs text-gold-400">Envoi en cours…</p>}
-        </div>
-
-        <button onClick={onClose} className="btn-secondary mt-6 w-full">Terminer</button>
-      </div>
     </div>
   );
 }

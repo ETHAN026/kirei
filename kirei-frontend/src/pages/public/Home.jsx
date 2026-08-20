@@ -88,7 +88,6 @@ export default function Home() {
   const [coupes, setCoupes] = useState([]);
   const [assistants, setAssistants] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeService, setActiveService] = useState(-1);
 
   useEffect(() => {
     Promise.all([
@@ -104,9 +103,6 @@ export default function Home() {
   }, []);
 
   const services = coupes.length ? coupes : FALLBACK_SERVICES;
-  const previewImgs = services.map(
-    (s, i) => s.photos?.[0]?.url || GALLERY_FALLBACKS[i % GALLERY_FALLBACKS.length]
-  );
 
   const galleryPanels = [
     ...(coupes.length
@@ -165,21 +161,7 @@ export default function Home() {
           </span>
         </h1>
 
-        {/* Image artistique (sort de la grille) */}
-        <div className="pointer-events-none absolute right-4 top-[26%] z-0 hidden w-[24vw] max-w-[400px] overflow-hidden lg:block">
-          <div className="hero-line" style={{ '--d': '2.2s' }}>
-            <div className="fade-up" style={{ '--d': '2.4s' }}>
-              <div className="relative aspect-[3/4]">
-                <img
-                  src={HERO_IMG}
-                  alt="Coupe réalisée au studio UltraBarber"
-                  className="h-full w-full object-cover"
-                />
-                <span className="absolute -bottom-5 -left-5 h-16 w-16 border-b border-l border-white/30" />
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         {/* Zone basse */}
         <div className="relative z-10 mt-auto grid gap-10 px-5 pb-8 pt-14 md:px-10 lg:grid-cols-[1fr_auto_1fr] lg:items-end">
@@ -223,23 +205,6 @@ export default function Home() {
           <Loader />
         ) : (
           <div className="relative mt-14">
-            {/* Aperçu image au survol (desktop) */}
-            <div className="pointer-events-none absolute inset-y-0 right-[7%] z-10 hidden w-[300px] items-center lg:flex">
-              {previewImgs.map((img, i) => (
-                <img
-                  key={i}
-                  src={img}
-                  alt=""
-                  aria-hidden
-                  loading="lazy"
-                  className={`img-bw absolute inset-0 h-[340px] w-full object-cover transition-all duration-500 ${
-                    activeService === i ? 'opacity-100' : 'opacity-0'
-                  }`}
-                />
-              ))}
-              <span className="absolute -bottom-4 -right-4 h-14 w-14 border-b border-r border-night/30" />
-            </div>
-
             <div>
               {services.map((s, i) => (
                 <Link
@@ -247,10 +212,8 @@ export default function Home() {
                   to="/reserver"
                   state={s.id ? { coupeId: s.id } : undefined}
                   className="service-row group"
-                  onMouseEnter={() => setActiveService(i)}
-                  onMouseLeave={() => setActiveService(-1)}
                 >
-                  <span className="font-mono text-[11px] text-night/40 transition-colors duration-500 group-hover:text-white/40">
+                  <span className="font-mono text-[11px] text-night/40 transition-colors duration-500 group-hover:text-night/30">
                     0{i + 1}
                   </span>
                   <span className="font-display text-[clamp(1.05rem,2.4vw,1.8rem)] font-black uppercase leading-none tracking-tight">
