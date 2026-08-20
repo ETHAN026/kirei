@@ -15,8 +15,6 @@ const FALLBACK = [
 export default function Catalogue() {
   const [coupes, setCoupes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [active, setActive] = useState(-1);
-
   useEffect(() => {
     getCoupes()
       .then(setCoupes)
@@ -54,32 +52,14 @@ export default function Catalogue() {
         {loading ? (
           <Loader />
         ) : (
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 right-[6%] z-10 hidden w-[320px] items-center lg:flex">
-              {services.map((s, i) => (
-                <img
-                  key={s.id}
-                  src={s.photos?.[0]?.url || `/images/gallery-01.jpg`}
-                  alt=""
-                  aria-hidden
-                  loading="lazy"
-                  className={`img-bw absolute inset-0 h-[380px] w-full object-cover transition-all duration-500 ${
-                    active === i ? 'opacity-100' : 'opacity-0'
-                  }`}
-                />
-              ))}
-            </div>
-
-            <div>
-              {services.map((s, i) => (
-                <Link
-                  key={s.id}
-                  to="/reserver"
-                  state={{ coupeId: s.id }}
-                  className="service-row group"
-                  onMouseEnter={() => setActive(i)}
-                  onMouseLeave={() => setActive(-1)}
-                >
+          <div>
+            {services.map((s, i) => (
+              <Link
+                key={s.id}
+                to="/reserver"
+                state={{ coupeId: s.id }}
+                className="service-row group"
+              >
                   <span className="font-mono text-[11px] text-night/40 transition-colors duration-500 group-hover:text-white/40">
                     {String(i + 1).padStart(2, '0')}
                   </span>
@@ -104,7 +84,6 @@ export default function Catalogue() {
                 </Link>
               ))}
             </div>
-          </div>
         )}
       </section>
 
