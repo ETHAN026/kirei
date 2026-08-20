@@ -184,13 +184,13 @@
 
   /* ---------- Images ---------- */
   .img-bw {
-    filter: contrast(1.04) saturate(1.1);
+    filter: grayscale(1) contrast(1.06);
     transition: filter 0.7s cubic-bezier(0.22, 1, 0.36, 1),
       transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .group:hover .img-bw,
   .img-bw:hover {
-    filter: contrast(1.08) saturate(1.2);
+    filter: grayscale(0) contrast(1.02) saturate(1.05);
   }
 
   /* ---------- Curseur custom (croix éditoriale) ---------- */
@@ -392,6 +392,20 @@
     to {
       background-position-x: 76.37px;
     }
+  }
+
+  /* ---------- Bande défilante (marquee) ---------- */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll 25s linear infinite;
+  }
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+  @keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
   }
 
   /* ---------- Ligne de prestation (galerie éditoriale) ---------- */

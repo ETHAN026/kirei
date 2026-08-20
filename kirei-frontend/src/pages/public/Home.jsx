@@ -34,110 +34,50 @@ const FALLBACK_SERVICES = [
   { nom: 'Coupe + barbe', prixFcfa: 5000, description: 'Le rituel complet UltraBarber.' },
 ];
 
-/* --- Galerie horizontale pilotée par le scroll (desktop) --- */
-function HorizontalGallery({ panels }) {
-  const sectionRef = useRef(null);
-  const trackRef = useRef(null);
-  const barRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(
-    () => window.matchMedia('(max-width: 1023px)').matches
-  );
+/* --- Galerie en grille masonry --- */
+function MasonryGallery({ panels }) {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef(null);
 
   useEffect(() => {
-    const mq = window.matchMedia('(max-width: 1023px)');
-    const onChange = (e) => setIsMobile(e.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.1 });
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
 
-  useEffect(() => {
-    const section = sectionRef.current;
-    const track = trackRef.current;
-    if (!section || !track || isMobile) return;
-
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      const rect = section.getBoundingClientRect();
-      const total = section.offsetHeight - window.innerHeight;
-      const p = total > 0 ? Math.min(Math.max(-rect.top / total, 0), 1) : 0;
-      const shift = (track.scrollWidth - window.innerWidth) * p;
-      track.style.transform = `translate3d(${-shift}px, 0, 0)`;
-      if (barRef.current) barRef.current.style.transform = `scaleX(${p})`;
-    };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    update();
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [isMobile]);
-
   return (
-    <section
-      ref={sectionRef}
-      className={`relative bg-night text-white ${isMobile ? '' : 'h-[300vh]'}`}
-      aria-label="Galerie"
-    >
-      <div className={`flex flex-col ${isMobile ? '' : 'sticky top-0 h-screen overflow-hidden'}`}>
-        <div
-          ref={trackRef}
-          className={`flex items-center gap-6 px-5 md:gap-12 md:px-10 ${
-            isMobile
-              ? 'h-[76vh] min-w-0 snap-x snap-mandatory overflow-x-auto pb-8'
-              : 'h-full w-max will-change-transform'
-          }`}
-        >
+    <section ref={ref} className="relative bg-night text-white py-20 md:py-28" aria-label="Galerie">
+      <div className="mx-auto max-w-[1400px] px-5 md:px-10">
+        <p className="mono-label mb-10 text-clay-500">05 — Galerie</p>
+        <div className="columns-2 md:columns-3 lg:columns-4 gap-4">
           {panels.map((p, i) => (
             <figure
               key={i}
-              data-cursor="VIEW"
-              className="group relative shrink-0 snap-center overflow-hidden"
-              style={{ width: p.w, height: p.tall ? '74vh' : '58vh' }}
+              className={`group relative mb-4 overflow-hidden break-inside-avoid ${
+                visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
+              style={{ transition: `opacity 0.7s ${i * 0.08}s, transform 0.7s ${i * 0.08}s` }}
             >
               <img
                 src={p.img}
                 alt={p.caption}
                 loading="lazy"
-                className="img-bw h-full w-full object-cover"
+                className="img-bw h-auto w-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
-              <figcaption className="mono-label absolute bottom-4 left-4 flex items-center gap-3 text-white/80 mix-blend-difference">
+              <figcaption className="mono-label absolute bottom-3 left-3 flex items-center gap-2 text-white/80 mix-blend-difference">
                 <span className="text-white/50">0{i + 1}</span>
                 {p.caption}
               </figcaption>
             </figure>
           ))}
-          <div
-            className="flex shrink-0 flex-col items-start justify-center gap-6 px-6 md:px-14"
-            style={{ width: 'min(80vw, 640px)' }}
-          >
-            <p className="mono-label text-white/50">05 — Galerie</p>
-            <RevealLines
-              text={'VOTRE COUPE\nNOUS ATTEND'}
-              className="font-display text-[clamp(1.6rem,3vw,2.8rem)] font-black uppercase leading-[0.9] tracking-tight"
-              lineClassName="outline-text"
-            />
-            <Link
-              to="/reserver"
-              className="btn-underline text-white"
-              aria-label="Réserver"
-            >
-              Réserver <FiArrowUpRight className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
-            </Link>
-          </div>
         </div>
-        {!isMobile && (
-          <div className="absolute bottom-0 left-0 right-0 px-5 md:px-10">
-            <div className="h-px w-full bg-white/15">
-              <div ref={barRef} className="h-px w-full origin-left scale-x-0 bg-white" />
-            </div>
-          </div>
-        )}
+        <div className="mt-12 text-center">
+          <Link to="/reserver" className="btn-underline text-white" aria-label="Réserver">
+            Réserver <FiArrowUpRight className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -173,20 +113,16 @@ export default function Home() {
       ? coupes.map((c, i) => ({
           img: c.photos?.[0]?.url || GALLERY_FALLBACKS[i],
           caption: c.nom,
-          w: ['min(40vw, 620px)', 'min(28vw, 440px)', 'min(34vw, 520px)'][i % 3],
-          tall: i % 2 === 0,
         }))
       : []),
     ...GALLERY_FALLBACKS.map((img, i) => ({
       img,
       caption: ['Session fade', 'Travail de dégradé', 'Lignes & contours', 'Texture', 'Finitions', 'Atelier', 'Détails', 'Style'][i],
-      w: ['min(40vw, 620px)', 'min(26vw, 420px)', 'min(32vw, 500px)'][i % 3],
-      tall: i % 2 === 0,
     })),
   ];
 
   return (
-    <div className="page-enter">
+    <div className="page-enter px-8">
       {/* ============ 01 — HERO (vidéo de fond) ============ */}
       <section className="relative flex min-h-screen flex-col overflow-hidden">
         {/* Vidéo de fond */}
@@ -203,10 +139,8 @@ export default function Home() {
           </video>
           {/* Overlay sombre pour lisibilité */}
           <div className="absolute inset-0 bg-black/55" />
-          {/* Gradient barber rouge → bleu en bas */}
+          {/* Gradient en bas */}
           <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-          {/* Accent latéral rouge barber */}
-          <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-clay-500 via-cream to-[#2F54C4]" />
         </div>
 
         <LightOverlay />
@@ -335,33 +269,39 @@ export default function Home() {
         )}
       </section>
 
-      {/* ============ Transition typographique ============ */}
-      <section className="relative overflow-hidden border-y border-white/10 bg-night py-4 md:py-6">
-        {/* Fond barber animé subtil */}
-        <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: 'repeating-linear-gradient(45deg, #C63B35 0 18px, #F4F2EE 18px 36px, #2F54C4 36px 54px)',
-        }} />
-        <h2
-          className="relative whitespace-nowrap text-center font-display text-[clamp(1.2rem,3vw,2.6rem)] font-black uppercase leading-none tracking-tight"
-          style={{ WebkitTextStroke: '1px rgba(255,255,255,0.28)', color: 'transparent' }}
-          aria-hidden
-        >
-          <span className="text-clay-500" style={{ WebkitTextStroke: '1px #C63B35' }}>CUT</span>
-          <span className="mx-2"> · </span>
-          <span>FADE</span>
-          <span className="mx-2"> · </span>
-          <span className="text-[#2F54C4]" style={{ WebkitTextStroke: '1px #2F54C4' }}>BEARD</span>
-          <span className="mx-2"> · </span>
-          <span>LINE-UP</span>
-          <span className="mx-2"> · </span>
-          <span className="text-clay-500" style={{ WebkitTextStroke: '1px #C63B35' }}>CUT</span>
-          <span className="mx-2"> · </span>
-          <span>FADE</span>
-        </h2>
+      {/* ============ Bande défilante (marquee) ============ */}
+      <section className="relative overflow-hidden border-y border-white/10 bg-night py-5 md:py-6">
+        <div className="marquee-track">
+          {[...Array(3)].map((_, setIdx) => (
+            <div key={setIdx} className="flex shrink-0 items-center">
+              {[
+                { intl: 'CUT', fr: 'Coupe' },
+                { intl: 'FADE', fr: 'Dégradé' },
+                { intl: 'BEARD', fr: 'Barbe' },
+                { intl: 'LINE-UP', fr: 'Contour' },
+                { intl: 'TAPER', fr: 'Affûtage' },
+                { intl: 'DESIGN', fr: 'Motif' },
+              ].map((item, i) => (
+                <div key={`${setIdx}-${i}`} className="flex items-center gap-6 px-6">
+                  <div className="flex flex-col items-center">
+                    <span
+                      className="font-display text-[clamp(1.2rem,2.5vw,2.2rem)] font-black uppercase leading-none tracking-tight"
+                      style={{ WebkitTextStroke: '1px rgba(255,255,255,0.35)', color: 'transparent' }}
+                    >
+                      {item.intl}
+                    </span>
+                    <span className="mono-label mt-1 text-clay-500/80">{item.fr}</span>
+                  </div>
+                  <span className="text-clay-500/40">·</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </section>
 
-      {/* ============ 03 — GALERIE (scroll horizontal) ============ */}
-      <HorizontalGallery panels={galleryPanels} />
+      {/* ============ 03 — GALERIE (masonry) ============ */}
+      <MasonryGallery panels={galleryPanels} />
 
       {/* ============ 04 — LE STUDIO ============ */}
       <section className="relative mx-auto max-w-[1400px] px-5 py-24 md:px-10 md:py-32">
