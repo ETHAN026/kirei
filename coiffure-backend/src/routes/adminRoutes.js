@@ -41,6 +41,7 @@ const {
 const { dashboard, coupesPopulaires } = require('../controllers/dashboardController');
 const { listClients, getClient } = require('../controllers/clientController');
 const { exportPdf, exportExcel } = require('../controllers/rapportController');
+const emailService = require('../services/emailService');
 
 const router = express.Router();
 
@@ -92,5 +93,26 @@ router.get('/clients/:id', getClient);
 // --- Rapports exportables ---
 router.get('/rapports/pdf', exportPdf);
 router.get('/rapports/excel', exportExcel);
+
+// --- Test email (temporaire, à supprimer après debug) ---
+router.post('/test-email', async (req, res) => {
+  const transporter = require('../config/mailer');
+  const to = req.body.email || process.env.SMTP_USER;
+  try {
+    await transporter.verify();
+    console.log('[test-email] SMTP verify OK');
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to,
+      subject: 'Test ULTRABARBER — email fonctionne ✅',
+      html: '<h2>Mail de test ULTRABARBER</h2><p>Si tu reçois ce mail, SMTP fonctionne depuis Render !</p>',
+    });
+    console.log('[test-email] Mail envoyé:', info.messageId);
+    res.json({ ok: true, messageId: info.messageId, to });
+  } catch (err) {
+    console.error('[test-email] ERREUR:', err.message, err.code);
+    res.status(500).json({ ok: false, error: err.message, code: err.code });
+  }
+});
 
 module.exports = router;
