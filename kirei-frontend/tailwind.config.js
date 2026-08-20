@@ -28,6 +28,11 @@ export default {
           500: '#C63B35',
           600: '#A32F2A',
         },
+        barber: {
+          red: '#C63B35',
+          blue: '#2F54C4',
+          white: '#F4F2EE',
+        },
       },
       fontFamily: {
         display: ['Archivo', 'sans-serif'],

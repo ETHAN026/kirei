@@ -187,27 +187,47 @@ export default function Home() {
 
   return (
     <div className="page-enter">
-      {/* ============ 01 — HERO ============ */}
-      <section className="relative flex min-h-screen flex-col overflow-hidden bg-paper">
+      {/* ============ 01 — HERO (vidéo de fond) ============ */}
+      <section className="relative flex min-h-screen flex-col overflow-hidden">
+        {/* Vidéo de fond */}
+        <div className="absolute inset-0 z-0">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover"
+            poster={HERO_IMG}
+          >
+            <source src="/videos/atelier-01.mp4" type="video/mp4" />
+          </video>
+          {/* Overlay sombre pour lisibilité */}
+          <div className="absolute inset-0 bg-black/55" />
+          {/* Gradient barber rouge → bleu en bas */}
+          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          {/* Accent latéral rouge barber */}
+          <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-clay-500 via-cream to-[#2F54C4]" />
+        </div>
+
         <LightOverlay />
 
         {/* Méta supérieure */}
         <div className="relative z-10 flex items-start justify-between px-5 pt-28 md:px-10">
-          <p className="mono-label fade-up text-night/50" style={{ '--d': '2.05s' }}>
+          <p className="mono-label fade-up text-cream/50" style={{ '--d': '2.05s' }}>
             No°001 — Luxury barber studio
           </p>
-          <p className="mono-label fade-up text-night/50" style={{ '--d': '2.15s' }}>
+          <p className="mono-label fade-up text-cream/50" style={{ '--d': '2.15s' }}>
             {salon?.adresse ? 'YND — ' : ''}Réservation en ligne
           </p>
         </div>
 
         {/* Typographie monumentale */}
-        <h1 className="relative z-10 mt-6 font-display font-black uppercase leading-[0.85] tracking-tight text-night md:mt-10">
+        <h1 className="relative z-10 mt-6 font-display font-black uppercase leading-[0.85] tracking-tight text-white md:mt-10">
           <span className="hero-line ml-[-2vw] block text-[clamp(2.2rem,9vw,9rem)]">
             <span style={{ '--d': '1.75s' }}>ULTRA</span>
           </span>
           <span className="hero-line ml-[5vw] block text-[clamp(2.2rem,9vw,9rem)]">
-            <span style={{ '--d': '1.9s' }}>BARBER</span>
+            <span style={{ '--d': '1.9s' }}><span className="text-clay-500">BAR</span><span>BER</span></span>
           </span>
         </h1>
 
@@ -215,23 +235,21 @@ export default function Home() {
         <div className="pointer-events-none absolute right-4 top-[26%] z-0 hidden w-[24vw] max-w-[400px] overflow-hidden lg:block">
           <div className="hero-line" style={{ '--d': '2.2s' }}>
             <div className="fade-up" style={{ '--d': '2.4s' }}>
-              <div className="relative aspect-[3/4] bg-night/5">
+              <div className="relative aspect-[3/4]">
                 <img
                   src={HERO_IMG}
                   alt="Coupe réalisée au studio UltraBarber"
-                  className="img-bw h-full w-full object-cover"
+                  className="h-full w-full object-cover"
                 />
-                <span className="absolute -bottom-5 -left-5 h-16 w-16 border-b border-l border-night/30" />
+                <span className="absolute -bottom-5 -left-5 h-16 w-16 border-b border-l border-white/30" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Bâtons de barbier — déplacés en pied de page */}
-
         {/* Zone basse */}
         <div className="relative z-10 mt-auto grid gap-10 px-5 pb-8 pt-14 md:px-10 lg:grid-cols-[1fr_auto_1fr] lg:items-end">
-          <div className="fade-up flex flex-col gap-2 font-mono text-[10px] uppercase tracking-wide2 text-night/55" style={{ '--d': '2.3s' }}>
+          <div className="fade-up flex flex-col gap-2 font-mono text-[10px] uppercase tracking-wide2 text-cream/55" style={{ '--d': '2.3s' }}>
             {salon?.adresse && (
               <span className="flex items-center gap-2">
                 <FiMapPin size={12} /> {salon.adresse}
@@ -246,8 +264,8 @@ export default function Home() {
           </div>
 
           <div className="fade-up hidden flex-col items-center gap-3 lg:flex" style={{ '--d': '2.45s' }}>
-            <span className="h-12 w-px animate-pulse bg-night/30" />
-            <span className="mono-label rotate-90 text-night/40">Scroll</span>
+            <span className="h-12 w-px animate-pulse bg-white/30" />
+            <span className="mono-label rotate-90 text-white/40">Scroll</span>
           </div>
 
           <div className="fade-up flex justify-start lg:justify-end" style={{ '--d': '2.5s' }}>
@@ -318,13 +336,27 @@ export default function Home() {
       </section>
 
       {/* ============ Transition typographique ============ */}
-      <section className="overflow-hidden border-y border-white/10 bg-night py-4 md:py-6">
+      <section className="relative overflow-hidden border-y border-white/10 bg-night py-4 md:py-6">
+        {/* Fond barber animé subtil */}
+        <div className="absolute inset-0 opacity-[0.04]" style={{
+          backgroundImage: 'repeating-linear-gradient(45deg, #C63B35 0 18px, #F4F2EE 18px 36px, #2F54C4 36px 54px)',
+        }} />
         <h2
-          className="whitespace-nowrap text-center font-display text-[clamp(1.2rem,3vw,2.6rem)] font-black uppercase leading-none tracking-tight"
+          className="relative whitespace-nowrap text-center font-display text-[clamp(1.2rem,3vw,2.6rem)] font-black uppercase leading-none tracking-tight"
           style={{ WebkitTextStroke: '1px rgba(255,255,255,0.28)', color: 'transparent' }}
           aria-hidden
         >
-          CUT · FADE · BEARD · LINE-UP · CUT · FADE
+          <span className="text-clay-500" style={{ WebkitTextStroke: '1px #C63B35' }}>CUT</span>
+          <span className="mx-2"> · </span>
+          <span>FADE</span>
+          <span className="mx-2"> · </span>
+          <span className="text-[#2F54C4]" style={{ WebkitTextStroke: '1px #2F54C4' }}>BEARD</span>
+          <span className="mx-2"> · </span>
+          <span>LINE-UP</span>
+          <span className="mx-2"> · </span>
+          <span className="text-clay-500" style={{ WebkitTextStroke: '1px #C63B35' }}>CUT</span>
+          <span className="mx-2"> · </span>
+          <span>FADE</span>
         </h2>
       </section>
 

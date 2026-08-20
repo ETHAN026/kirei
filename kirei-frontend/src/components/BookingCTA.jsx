@@ -13,12 +13,12 @@ export default function BookingCTA({ to = '/reserver', dark = false, className =
         <defs>
           <path id="bookCtaPath" d="M50,50 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0" />
         </defs>
-        <text style={{ fontFamily: '"Space Mono", monospace', fontSize: '8px', letterSpacing: '0.3em' }}>
+        <text style={{ fontFamily: '"Space Mono", monospace', fontSize: '8px', letterSpacing: '0.3em', fill: dark ? '#fff' : '#C63B35' }}>
           <textPath href="#bookCtaPath">{label}</textPath>
         </text>
       </svg>
       <span className="cta-arrow">
-        <FiArrowUpRight size={30} strokeWidth={1.5} />
+        <FiArrowUpRight size={30} strokeWidth={1.5} className="text-clay-500" />
       </span>
     </MagneticButton>
   );
