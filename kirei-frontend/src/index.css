@@ -184,13 +184,13 @@
 
   /* ---------- Images ---------- */
   .img-bw {
-    filter: grayscale(1) contrast(1.06);
+    filter: contrast(1.04) saturate(1.1);
     transition: filter 0.7s cubic-bezier(0.22, 1, 0.36, 1),
       transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .group:hover .img-bw,
   .img-bw:hover {
-    filter: grayscale(0) contrast(1.02);
+    filter: contrast(1.08) saturate(1.2);
   }
 
   /* ---------- Curseur custom (croix éditoriale) ---------- */
