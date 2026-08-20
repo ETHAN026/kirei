@@ -13,7 +13,6 @@ import { FiArrowUpRight, FiMapPin, FiPhone } from 'react-icons/fi';
 
 /* ============ MÉDIAS LOCAUX ============ */
 const SALON_VIDEO = '/videos/salon.mp4';
-const HERO_IMG = '/images/hero.jpg';
 const SALON_IMG = '/images/salon.jpg';
 
 const GALLERY_FALLBACKS = [
@@ -124,13 +123,13 @@ export default function Home() {
             muted
             loop
             playsInline
+            preload="auto"
             className="absolute inset-0 h-full w-full object-cover"
-            poster={HERO_IMG}
           >
             <source src="/videos/atelier-01.mp4" type="video/mp4" />
           </video>
           {/* Overlay sombre pour lisibilité */}
-          <div className="absolute inset-0 bg-black/55" />
+          <div className="absolute inset-0 bg-black/50" />
           {/* Gradient en bas */}
           <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>
