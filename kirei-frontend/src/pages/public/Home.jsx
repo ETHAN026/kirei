@@ -122,7 +122,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="page-enter px-8">
+    <div className="page-enter">
       {/* ============ 01 — HERO (vidéo de fond) ============ */}
       <section className="relative flex min-h-screen flex-col overflow-hidden">
         {/* Vidéo de fond */}
@@ -156,11 +156,11 @@ export default function Home() {
         </div>
 
         {/* Typographie monumentale */}
-        <h1 className="relative z-10 mt-6 font-display font-black uppercase leading-[0.85] tracking-tight text-white md:mt-10">
-          <span className="hero-line ml-[-2vw] block text-[clamp(2.2rem,9vw,9rem)]">
+        <h1 className="relative z-10 mt-6 px-5 font-display font-black uppercase leading-[0.85] tracking-tight text-white md:mt-10 md:px-10">
+          <span className="hero-line block text-[clamp(2.2rem,9vw,9rem)]">
             <span style={{ '--d': '1.75s' }}>ULTRA</span>
           </span>
-          <span className="hero-line ml-[5vw] block text-[clamp(2.2rem,9vw,9rem)]">
+          <span className="hero-line block text-[clamp(2.2rem,9vw,9rem)]">
             <span style={{ '--d': '1.9s' }}><span className="text-clay-500">BAR</span><span>BER</span></span>
           </span>
         </h1>
